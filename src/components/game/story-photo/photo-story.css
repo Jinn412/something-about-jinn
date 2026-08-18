@@ -1,0 +1,681 @@
+/* Photo Story 01 — pixel scene animations */
+
+@keyframes ps-grass-sway {
+  0%,
+  100% {
+    transform: skewX(-1deg);
+  }
+  50% {
+    transform: skewX(1deg);
+  }
+}
+
+@keyframes ps-cloud-drift {
+  from {
+    transform: translateX(-8%);
+  }
+  to {
+    transform: translateX(8%);
+  }
+}
+
+@keyframes ps-bird-fly {
+  0% {
+    transform: translate(-120%, 0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(120vw, -12%);
+    opacity: 0;
+  }
+}
+
+@keyframes ps-light-flicker {
+  0%,
+  100% {
+    opacity: 0.15;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes ps-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes ps-path-draw {
+  from {
+    stroke-dashoffset: 120;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.ps-grass-layer {
+  animation: ps-grass-sway 3.2s steps(4, end) infinite;
+}
+
+.ps-cloud-layer {
+  animation: ps-cloud-drift 28s linear infinite;
+}
+
+.ps-bird {
+  animation: ps-bird-fly 14s steps(8, end) infinite;
+}
+
+.ps-scene-fade {
+  animation: ps-fade-in 700ms steps(6, end);
+}
+
+.ps-scene-cross-out {
+  animation: ps-scene-cross-out 0.6s ease-in-out forwards;
+}
+
+.ps-scene-cross-in {
+  animation: ps-scene-cross-in 0.8s ease-in-out both;
+}
+
+@keyframes ps-scene-cross-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes ps-scene-cross-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.ps-gallery-light {
+  animation: ps-light-flicker 1.4s steps(3, end) forwards;
+}
+
+.ps-secret-paper {
+  background: oklch(0.86 0.04 85);
+  box-shadow:
+    inset 0 0 0 4px oklch(0.78 0.05 78),
+    inset 0 0 0 8px oklch(0.72 0.06 72),
+    4px 4px 0 oklch(0 0 0 / 35%);
+}
+
+/* Scene 1 — Beat 3 direction: road fade, birds drift. Once, no loop. */
+@keyframes ps-s1-road-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.ps-s1-road {
+  opacity: 0;
+}
+
+.ps-s1-road.ps-s1-in {
+  animation: ps-s1-road-in 1.8s ease-out forwards;
+}
+
+@keyframes ps-s1-birds-near {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) scale(1);
+  }
+  18% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+    transform: translate(7%, calc(-4% - 2px)) scale(0.96);
+  }
+}
+
+@keyframes ps-s1-birds-mid {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) scale(1);
+  }
+  14% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+    transform: translate(5%, calc(-3% - 2px)) scale(0.97);
+  }
+}
+
+@keyframes ps-s1-birds-far {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) scale(1);
+  }
+  12% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+    transform: translate(3%, calc(-2% - 1px)) scale(0.98);
+  }
+}
+
+.ps-s1-birds-near,
+.ps-s1-birds-mid,
+.ps-s1-birds-far {
+  opacity: 0;
+}
+
+.ps-s1-birds-near {
+  transform-origin: 30% 37%;
+}
+
+.ps-s1-birds-mid {
+  transform-origin: 44% 30%;
+}
+
+.ps-s1-birds-far {
+  transform-origin: 60% 21%;
+}
+
+.ps-s1-birds-near.ps-s1-in {
+  animation: ps-s1-birds-near 5s ease-out 0s both;
+}
+
+.ps-s1-birds-mid.ps-s1-in {
+  animation: ps-s1-birds-mid 6.5s ease-out 0.4s both;
+}
+
+.ps-s1-birds-far.ps-s1-in {
+  animation: ps-s1-birds-far 8s ease-out 0.8s both;
+}
+
+@keyframes ps-s2-stat-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.ps-s2-stat {
+  animation: ps-s2-stat-in 0.55s ease-in-out both;
+}
+
+@keyframes ps-s2-campus-push {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.025);
+  }
+}
+
+.ps-s2-campus-push {
+  transform-origin: 50% 50%;
+  animation: ps-s2-campus-push 3.5s ease-in-out forwards;
+}
+
+@keyframes ps-geo-train-move {
+  from {
+    left: -52%;
+  }
+  to {
+    left: 100%;
+  }
+}
+
+@keyframes ps-geo-train-rattle {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(2px);
+  }
+}
+
+.ps-geo-train {
+  left: -52%;
+  animation: ps-geo-train-move 10s linear 1.3s both;
+}
+
+.ps-geo-train-body {
+  animation: ps-geo-train-rattle 0.62s linear 1.3s 16 both;
+}
+
+@keyframes ps-s3-raw-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes ps-s3-showroom-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.ps-s3-raw-out {
+  animation: ps-s3-raw-out 1.4s ease-in-out forwards;
+}
+
+.ps-s3-showroom-in {
+  animation: ps-s3-showroom-in 1.4s ease-in-out forwards;
+}
+
+.ps-s3-glow-main,
+.ps-s3-glow-kiosk,
+.ps-s3-glow-box {
+  opacity: 0;
+  mix-blend-mode: screen;
+}
+
+.ps-s3-glow-main {
+  background: radial-gradient(
+    ellipse at center,
+    oklch(0.88 0.06 230 / 55%) 0%,
+    oklch(0.82 0.08 220 / 18%) 42%,
+    transparent 72%
+  );
+  transition: opacity 3.2s ease-out;
+}
+
+.ps-s3-glow-kiosk {
+  background: radial-gradient(
+    ellipse at center,
+    oklch(0.78 0.12 240 / 50%) 0%,
+    transparent 70%
+  );
+  transition: opacity 2.6s ease-out;
+}
+
+.ps-s3-glow-box {
+  background: linear-gradient(
+    180deg,
+    oklch(0.86 0.05 85 / 35%) 0%,
+    oklch(0.8 0.06 230 / 28%) 50%,
+    oklch(0.86 0.05 85 / 22%) 100%
+  );
+  transition: opacity 2.6s ease-out;
+}
+
+.ps-s3-glow-main.is-on,
+.ps-s3-glow-kiosk.is-on,
+.ps-s3-glow-box.is-on {
+  opacity: 1;
+}
+
+@keyframes ps-s4-sg-push {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.015);
+  }
+}
+
+.ps-s4-sg-push {
+  transform-origin: 50% 50%;
+  animation: ps-s4-sg-push 6s ease-out forwards;
+}
+
+@keyframes ps-s4-ntu-push {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.02);
+  }
+}
+
+.ps-s4-ntu-push {
+  transform-origin: 50% 50%;
+  animation: ps-s4-ntu-push 6s ease-out forwards;
+}
+
+@keyframes ps-s4-sg-look-up {
+  from {
+    transform: scale(1.015) translateY(0);
+  }
+  to {
+    transform: scale(1.2) translateY(5%);
+  }
+}
+
+.ps-s4-sg-look-up {
+  transform-origin: 50% 32%;
+  animation: ps-s4-sg-look-up 2.2s ease-in-out forwards;
+}
+
+.ps-s4-ntu-from-sky {
+  transform-origin: 50% 32%;
+  transform: scale(1.2) translateY(5%);
+}
+
+@keyframes ps-s4-ntu-look-down {
+  from {
+    transform: scale(1.2) translateY(5%);
+  }
+  to {
+    transform: scale(1) translateY(0);
+  }
+}
+
+.ps-s4-ntu-look-down {
+  transform-origin: 50% 32%;
+  animation: ps-s4-ntu-look-down 2.2s ease-in-out forwards;
+}
+
+@keyframes ps-s4-sky-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes ps-s4-sky-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.ps-s4-sky-out {
+  animation: ps-s4-sky-out 1.2s ease-in-out forwards;
+}
+
+.ps-s4-sky-in {
+  animation: ps-s4-sky-in 1.2s ease-in-out forwards;
+}
+
+@keyframes ps-s4-ntu-into {
+  from {
+    transform: scale(1.02);
+  }
+  to {
+    transform: scale(1.035);
+  }
+}
+
+.ps-s4-ntu-into {
+  transform-origin: 50% 50%;
+  animation: ps-s4-ntu-into 1.6s ease-in-out forwards;
+}
+
+@keyframes ps-s4-know-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes ps-s4-know-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.ps-s4-know-out {
+  animation: ps-s4-know-out 1.3s ease-in-out 0.8s forwards;
+}
+
+.ps-s4-know-in {
+  animation: ps-s4-know-in 1.3s ease-in-out 0.8s both;
+}
+
+@keyframes ps-s4-know-ambient {
+  0%,
+  100% {
+    filter: brightness(1);
+  }
+  50% {
+    filter: brightness(1.015);
+  }
+}
+
+.ps-s4-know-ambient {
+  animation: ps-s4-know-ambient 6.5s ease-in-out infinite;
+}
+
+@keyframes ps-s4-know-screen {
+  0%,
+  100% {
+    opacity: 0.05;
+  }
+  50% {
+    opacity: 0.12;
+  }
+}
+
+.ps-s4-know-screen {
+  mix-blend-mode: screen;
+  background: radial-gradient(
+    ellipse at center,
+    oklch(0.86 0.07 230 / 40%) 0%,
+    transparent 72%
+  );
+  animation: ps-s4-know-screen 5.4s ease-in-out infinite;
+}
+
+.ps-s5-cross-out {
+  animation: ps-scene-cross-out 1.4s ease-in-out forwards;
+}
+
+.ps-s5-cross-in {
+  animation: ps-scene-cross-in 1.4s ease-in-out both;
+}
+
+@keyframes ps-s5-note-stick {
+  from {
+    opacity: 0;
+    transform: translateY(4px) scale(0.94) rotate(var(--note-from, -1.5deg));
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1) rotate(var(--note-to, 0deg));
+  }
+}
+
+.ps-s5-note-stick {
+  transform-origin: 50% 6%;
+  animation: ps-s5-note-stick 400ms ease-out both;
+}
+
+.ps-s5-note-on {
+  opacity: 1;
+  transform: translateY(0) scale(1) rotate(var(--note-to, 0deg));
+  transform-origin: 50% 6%;
+}
+
+@keyframes ps-s5-screen-breathe {
+  0%,
+  100% {
+    opacity: 0.04;
+  }
+  50% {
+    opacity: 0.1;
+  }
+}
+
+.ps-s5-screen-breathe {
+  mix-blend-mode: screen;
+  background: radial-gradient(
+    ellipse at center,
+    oklch(0.88 0.06 210 / 35%) 0%,
+    transparent 70%
+  );
+  animation: ps-s5-screen-breathe 6s ease-in-out infinite;
+}
+
+.ps-s6-dialogue-out {
+  animation: ps-s6-dialogue-out 350ms ease-out forwards;
+}
+
+.ps-s6-dialogue-in {
+  animation: ps-s6-dialogue-in 350ms ease-out both;
+}
+
+@keyframes ps-s6-dialogue-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes ps-s6-dialogue-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.ps-s6-through-push,
+.ps-s6-through-punch {
+  transform-origin: 50% 40%;
+}
+
+@keyframes ps-s6-through-push {
+  from {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+  to {
+    transform: scale(1.82);
+    filter: brightness(1);
+  }
+}
+
+.ps-s6-through-push {
+  animation: ps-s6-through-push 1.5s ease-in forwards;
+}
+
+@keyframes ps-s6-through-punch {
+  from {
+    transform: scale(1.82);
+    filter: brightness(1);
+  }
+  to {
+    transform: scale(2.2);
+    filter: brightness(1.05);
+  }
+}
+
+.ps-s6-through-punch {
+  animation: ps-s6-through-punch 520ms ease-in forwards;
+}
+
+@keyframes ps-s6-black-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.ps-s6-black-in {
+  animation: ps-s6-black-in 440ms ease-in forwards;
+}
+
+.ps-s6-black-hold {
+  opacity: 1;
+}
+
+@keyframes ps-s6-black-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.ps-s6-black-out {
+  animation: ps-s6-black-out 520ms ease-out forwards;
+}
+
+.ps-s6-path-hold {
+  transform-origin: 50% 40%;
+  transform: scale(1.1);
+}
+
+@keyframes ps-s6-path-settle {
+  from {
+    transform: scale(1.1);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+.ps-s6-path-settle {
+  transform-origin: 50% 40%;
+  animation: ps-s6-path-settle 900ms ease-out forwards;
+}
+
+@keyframes ps-s6-path-drift1 {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.01);
+  }
+}
+
+.ps-s6-path-drift1 {
+  transform-origin: 50% 40%;
+  animation: ps-s6-path-drift1 6s ease-out forwards;
+}
+
+@keyframes ps-s6-path-drift2 {
+  from {
+    transform: scale(1.01);
+  }
+  to {
+    transform: scale(1.02);
+  }
+}
+
+.ps-s6-path-drift2 {
+  transform-origin: 50% 40%;
+  animation: ps-s6-path-drift2 6s ease-out forwards;
+}
