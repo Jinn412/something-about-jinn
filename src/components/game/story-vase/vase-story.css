@@ -1,0 +1,1036 @@
+@keyframes vs-tender-drop {
+  0% {
+    transform: translateY(-110vh) rotate(-5deg) scale(0.9);
+  }
+  74% {
+    transform: translateY(3px) rotate(2deg) scale(1.02);
+  }
+  88% {
+    transform: translateY(-1px) rotate(-1deg) scale(0.997);
+  }
+  100% {
+    transform: translateY(0) rotate(-3deg) scale(1);
+  }
+}
+
+@keyframes vs-desk-impact {
+  0% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(2px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+@keyframes vs-deadline-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.vs-tender-drop {
+  animation: vs-tender-drop 720ms cubic-bezier(0.2, 0.8, 0.25, 1) both;
+}
+
+.vs-tender-drop-s3 {
+  animation: vs-tender-drop 760ms cubic-bezier(0.2, 0.8, 0.25, 1) both;
+}
+
+.vs-ability-out {
+  animation: vs-fade-out 300ms ease-out forwards;
+}
+
+.vs-ability-row {
+  animation: vs-ability-row-in 300ms ease-out both;
+}
+
+.vs-end-black {
+  position: absolute;
+  inset: 0;
+  z-index: 70;
+  background: #000;
+  pointer-events: none;
+  animation: vs-s3-cut-in 600ms ease-in-out both;
+}
+
+.vs-dialogue.is-end-out {
+  animation: vs-fade-out 300ms ease-out forwards;
+}
+
+.vs-secret-paper {
+  background: oklch(0.86 0.04 85);
+  box-shadow:
+    inset 0 0 0 4px oklch(0.78 0.05 78),
+    inset 0 0 0 8px oklch(0.72 0.06 72),
+    4px 4px 0 oklch(0 0 0 / 35%);
+}
+
+@keyframes vs-ability-row-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.vs-s3-extra {
+  position: absolute;
+  transform-origin: 50% 100%;
+  animation: vs-s3-extra-in 800ms cubic-bezier(0.22, 0.82, 0.28, 1) both;
+}
+
+.vs-s3-extra img {
+  display: block;
+  width: 100%;
+  height: auto;
+  background: transparent;
+  filter: drop-shadow(0 2px 2px oklch(0 0 0 / 18%));
+}
+
+@keyframes vs-s3-extra-in {
+  0% {
+    opacity: 0;
+    transform: translateY(-80px);
+  }
+  12% {
+    opacity: 1;
+    transform: translateY(-70px);
+  }
+  75% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  88% {
+    opacity: 1;
+    transform: translateY(3px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.vs-s3-cut {
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  background: #000;
+  pointer-events: none;
+  animation: vs-s3-cut-in 600ms ease-in-out both;
+}
+
+.vs-s3-cut.is-out {
+  animation: vs-s3-cut-out 650ms ease-in-out both;
+}
+
+.vs-s3-years {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 50;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  color: oklch(0.9 0.07 82);
+  font-size: 22px;
+  letter-spacing: 0.22em;
+  text-shadow: 0 1px 0 oklch(0 0 0 / 50%);
+  animation: vs-s3-years-in 350ms ease-out both;
+}
+
+.vs-s3-years.is-rest {
+  top: 12%;
+  transform: translate(-50%, 0);
+  animation: none;
+  opacity: 1;
+  transition:
+    top 650ms ease-in-out,
+    transform 650ms ease-in-out;
+}
+
+@keyframes vs-s3-cut-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes vs-s3-cut-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes vs-s3-years-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+.vs-desk-impact {
+  animation: vs-desk-impact 100ms ease-out both;
+}
+
+.vs-deadline-in {
+  animation: vs-deadline-in 200ms ease-out both;
+}
+
+.vs-dialogue .pixel-frame:empty {
+  display: none;
+}
+
+.vs-dialogue.is-out {
+  animation: vs-fade-out 180ms ease-out forwards;
+}
+
+.vs-desk-dim {
+  z-index: 1;
+  background: #000;
+  opacity: 0;
+  transition: opacity 600ms ease-out;
+  pointer-events: none;
+}
+
+.vs-desk-dim.is-on {
+  opacity: 0.2;
+}
+
+.vs-doc {
+  position: absolute;
+  left: 11%;
+  bottom: 18%;
+  z-index: 5;
+  width: min(27.5vw, 450px);
+  transform-origin: 50% 78%;
+}
+
+.vs-doc.is-desk-settled {
+  transform: rotate(-3deg);
+}
+
+.vs-doc.is-lift {
+  animation: vs-doc-lift 600ms cubic-bezier(0.2, 0.8, 0.25, 1) forwards;
+}
+
+.vs-doc.is-open {
+  left: 50%;
+  bottom: 32%;
+  width: min(58vw, 920px);
+  transform: translateX(-50%) rotate(0deg);
+  transform-origin: 50% 50%;
+}
+
+.vs-doc-closed,
+.vs-doc-open {
+  display: block;
+  width: 100%;
+  height: auto;
+  background: transparent;
+}
+
+.vs-doc-open {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: auto;
+  transform-origin: 50% 50%;
+  animation: vs-open-in 180ms ease-out both;
+}
+
+.vs-doc-closed.is-out {
+  animation: vs-fade-out 180ms ease-out forwards;
+}
+
+.vs-choice-row {
+  bottom: 13%;
+  animation: vs-fade-in 120ms ease-out both;
+}
+
+.vs-choice-row.is-out {
+  animation: vs-fade-out 180ms ease-out forwards;
+}
+
+.vs-float-hint {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 8px);
+  z-index: 6;
+  padding: 3px 7px;
+  border: 3px solid var(--wood-dark);
+  background: var(--parchment);
+  color: var(--ink);
+  font-size: 11px;
+  line-height: 1.4;
+  white-space: nowrap;
+  animation: vs-float-hint 800ms ease-out both;
+}
+
+.vs-highlight {
+  border: 3px solid oklch(0.92 0.08 95);
+  box-shadow:
+    inset 0 0 0 2px oklch(0.2 0.03 80 / 35%),
+    0 0 0 2px oklch(0.2 0.04 80 / 45%);
+  background: oklch(0.95 0.1 95 / 12%);
+  animation: vs-highlight-in 80ms steps(2, end) both;
+}
+
+@keyframes vs-doc-lift {
+  0% {
+    left: 11%;
+    bottom: 18%;
+    width: min(27.5vw, 450px);
+    transform: rotate(-3deg) scale(1);
+    transform-origin: 50% 78%;
+  }
+  100% {
+    left: 50%;
+    bottom: 32%;
+    width: min(58vw, 920px);
+    transform: translateX(-50%) rotate(0deg) scale(1);
+    transform-origin: 50% 50%;
+  }
+}
+
+@keyframes vs-open-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes vs-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes vs-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes vs-float-hint {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, 4px);
+  }
+  18% {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+  72% {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -6px);
+  }
+}
+
+@keyframes vs-highlight-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.vs-doc.is-open.is-recede {
+  animation: vs-doc-recede 420ms ease-in forwards;
+}
+
+.vs-s2-zoom {
+  transform: scale(2.8);
+  transform-origin: 50% 35%;
+  transition: transform 800ms cubic-bezier(0.2, 0.75, 0.2, 1);
+}
+
+.vs-s2-card {
+  position: absolute;
+  z-index: 9;
+  width: 210px;
+  padding: 12px 14px;
+  border: 4px solid var(--wood-dark);
+  background: var(--parchment);
+  color: var(--ink);
+  font-size: 15px;
+  line-height: 1.45;
+  text-align: left;
+  white-space: nowrap;
+  box-shadow:
+    inset 0 0 0 3px var(--parchment-dark),
+    0 0 0 3px oklch(0 0 0 / 35%);
+}
+
+.vs-s2-card.is-pop {
+  animation: vs-s2-pop 140ms steps(2, end) both;
+}
+
+.vs-s2-card.is-fly {
+  animation: vs-s2-fly 820ms cubic-bezier(0.28, 0.72, 0.22, 1) both;
+}
+
+.vs-s2-flash {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  background: #000;
+  animation: vs-s2-flash 140ms linear both;
+}
+
+.vs-s2-floor {
+  animation: vs-fade-in 220ms ease-out both;
+}
+
+.vs-s2-floor-card {
+  position: absolute;
+  z-index: 4;
+  width: 200px;
+  padding: 11px 13px;
+  border: 4px solid var(--wood-dark);
+  background: var(--parchment);
+  color: var(--ink);
+  font-size: 15px;
+  line-height: 1.4;
+  text-align: left;
+  white-space: nowrap;
+  box-shadow:
+    inset 0 0 0 3px var(--parchment-dark),
+    0 0 0 3px oklch(0 0 0 / 30%);
+  pointer-events: none;
+}
+
+.vs-s2-floor-card.is-open {
+  animation: vs-s2-unfold 300ms cubic-bezier(0.2, 0.8, 0.25, 1) both;
+}
+
+.vs-s2-floor-card.is-ping {
+  transform-origin: center center;
+  animation: vs-s2-card-hit 480ms ease-out both;
+}
+
+.vs-s2-floor-card.is-soft {
+  opacity: 0.4;
+  transform: scale(0.92);
+  transform-origin: left top;
+  transition:
+    opacity 400ms ease-out,
+    transform 400ms ease-out;
+}
+
+.vs-s2-floor-card.is-softest {
+  opacity: 0.3;
+  transform: scale(0.92);
+  transform-origin: left top;
+  transition: opacity 400ms ease-out;
+}
+
+.vs-s2-route-mask {
+  fill: none;
+  stroke: #fff;
+  stroke-width: 28;
+  stroke-linecap: round;
+  stroke-linejoin: miter;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+}
+
+.vs-s2-route-mask.is-draw {
+  animation: vs-s2-route-mask-draw 3600ms linear forwards;
+}
+
+.vs-s2-route-mask.is-shown {
+  stroke-dashoffset: 0;
+}
+
+@keyframes vs-s2-route-mask-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.vs-deadline-quiet {
+  opacity: 0.4;
+}
+
+@keyframes vs-doc-recede {
+  from {
+    left: 50%;
+    bottom: 32%;
+    width: min(58vw, 920px);
+    transform: translateX(-50%) rotate(0deg) scale(1);
+    opacity: 1;
+  }
+  to {
+    left: 50%;
+    bottom: 32%;
+    width: min(58vw, 920px);
+    transform: translateX(-50%) rotate(0deg) scale(0.86);
+    opacity: 0;
+  }
+}
+
+@keyframes vs-s2-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.72);
+  }
+  55% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes vs-s2-fly {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  72% {
+    left: var(--ex);
+    top: var(--ey);
+    transform: translate(-50%, -50%) scale(0.32);
+    opacity: 0.9;
+  }
+  100% {
+    left: var(--ex);
+    top: var(--ey);
+    transform: translate(-50%, -50%) scale(0.2);
+    opacity: 0.12;
+  }
+}
+
+@keyframes vs-s2-flash {
+  0% {
+    opacity: 0;
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes vs-s2-unfold {
+  0% {
+    width: 16px;
+    height: 16px;
+    padding: 0;
+    color: transparent;
+    overflow: hidden;
+  }
+  100% {
+    width: 200px;
+    height: auto;
+    padding: 11px 13px;
+    color: var(--ink);
+  }
+}
+
+@keyframes vs-s2-card-hit {
+  0% {
+    transform: scale(1);
+    filter: brightness(1);
+    box-shadow:
+      inset 0 0 0 3px var(--parchment-dark),
+      0 0 0 3px oklch(0 0 0 / 30%);
+  }
+  40% {
+    transform: scale(1.06);
+    filter: brightness(1.18);
+    box-shadow:
+      inset 0 0 0 3px var(--parchment-dark),
+      0 0 0 2px oklch(0.82 0.12 75 / 55%),
+      0 0 10px oklch(0.78 0.1 75 / 28%);
+  }
+  100% {
+    transform: scale(1);
+    filter: brightness(1);
+    box-shadow:
+      inset 0 0 0 3px var(--parchment-dark),
+      0 0 0 3px oklch(0 0 0 / 30%);
+  }
+}
+
+.vs-s3-note {
+  position: absolute;
+  z-index: 6;
+  width: 220px;
+  padding: 10px 12px;
+  border: 3px solid var(--wood-dark);
+  background: var(--parchment);
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.45;
+  box-shadow:
+    inset 0 0 0 2px var(--parchment-dark),
+    0 0 0 2px oklch(0 0 0 / 30%);
+  animation: vs-s3-note-in 220ms ease-out both;
+}
+
+.vs-s3-note.is-out {
+  animation: vs-fade-out 220ms ease-out forwards;
+}
+
+.vs-s3-note-who {
+  margin-bottom: 4px;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  opacity: 0.62;
+}
+
+.vs-s3-clock {
+  position: absolute;
+  top: 10.5%;
+  right: 4.2%;
+  z-index: 22;
+  border: 4px solid var(--wood-dark);
+  background: var(--parchment);
+  padding: 4px 12px;
+  font-size: 13px;
+  letter-spacing: 0.12em;
+  color: var(--ink);
+  transform: translate(0, 0);
+  transform-origin: top right;
+  box-shadow:
+    inset 0 0 0 3px var(--parchment-dark),
+    0 0 0 3px oklch(0 0 0 / 40%);
+  transition:
+    transform 450ms cubic-bezier(0.22, 0.85, 0.28, 1),
+    font-size 450ms cubic-bezier(0.22, 0.85, 0.28, 1),
+    padding 450ms cubic-bezier(0.22, 0.85, 0.28, 1),
+    letter-spacing 450ms cubic-bezier(0.22, 0.85, 0.28, 1);
+}
+
+.vs-s3-clock.is-focus {
+  z-index: 28;
+  padding: 12px 24px;
+  font-size: 34px;
+  letter-spacing: 0.14em;
+  transform: translate(-580px, 88px);
+}
+
+.vs-s3-rev-box {
+  position: absolute;
+  z-index: 5;
+  border: 3px dashed oklch(0.32 0.04 70 / 55%);
+  background: oklch(0.92 0.08 95 / 6%);
+}
+
+.vs-s3-rev {
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+}
+
+.vs-s3-r-bracket {
+  position: absolute;
+  z-index: 8;
+  opacity: 0;
+  background:
+    linear-gradient(var(--ink), var(--ink)) top left / 22px 3px no-repeat,
+    linear-gradient(var(--ink), var(--ink)) top left / 3px 22px no-repeat,
+    linear-gradient(var(--ink), var(--ink)) top right / 22px 3px no-repeat,
+    linear-gradient(var(--ink), var(--ink)) top right / 3px 22px no-repeat,
+    linear-gradient(var(--ink), var(--ink)) bottom left / 22px 3px no-repeat,
+    linear-gradient(var(--ink), var(--ink)) bottom left / 3px 22px no-repeat,
+    linear-gradient(var(--ink), var(--ink)) bottom right / 22px 3px no-repeat,
+    linear-gradient(var(--ink), var(--ink)) bottom right / 3px 22px no-repeat;
+}
+
+.vs-s3-r-a1 {
+  left: 18%;
+  top: 24%;
+  width: 17%;
+  height: 18%;
+  animation: vs-s3-r-in 160ms ease-out both;
+}
+
+.vs-s3-r-a2 {
+  left: 44%;
+  top: 34%;
+  width: 12%;
+  height: 10%;
+}
+
+.vs-s3-r-a2-line {
+  opacity: 0;
+  animation: vs-s3-r-in 180ms ease-out 210ms both;
+}
+
+.vs-s3-r-a3 {
+  left: 62%;
+  top: 22%;
+  width: 16%;
+  height: 18%;
+  animation: vs-s3-r-in 160ms ease-out 420ms both;
+}
+
+.vs-s3-r-route-tick {
+  position: absolute;
+  z-index: 8;
+  border-left: 3px solid oklch(0.78 0.12 75);
+  border-bottom: 3px solid oklch(0.78 0.12 75);
+  opacity: 0;
+  animation: vs-s3-r-in 160ms ease-out 210ms both;
+}
+
+.vs-s3-r-room {
+  position: absolute;
+  z-index: 6;
+  opacity: 0;
+}
+
+.vs-s3-r-room-l {
+  left: 17%;
+  top: 23%;
+  width: 20%;
+  height: 22%;
+}
+
+.vs-s3-r-room-r {
+  left: 60%;
+  top: 21%;
+  width: 19%;
+  height: 21%;
+}
+
+.vs-s3-r-room-old {
+  border: 3px solid var(--ink);
+  animation: vs-s3-r-old-room 900ms ease-out both;
+}
+
+.vs-s3-r-room-r.vs-s3-r-room-old {
+  animation-delay: 860ms;
+}
+
+.vs-s3-r-room-new {
+  left: 19%;
+  top: 26%;
+  width: 16%;
+  height: 16%;
+  border: 3px solid oklch(0.78 0.12 75);
+  animation: vs-s3-r-new-room 700ms ease-out 280ms both;
+}
+
+.vs-s3-r-room-r.vs-s3-r-room-new {
+  left: 63%;
+  top: 24%;
+  width: 15%;
+  height: 16%;
+  animation-delay: 1080ms;
+}
+
+.vs-s3-r-sign {
+  position: absolute;
+  z-index: 9;
+  font-size: 22px;
+  line-height: 1;
+  color: var(--ink);
+  opacity: 0;
+}
+
+.vs-s3-r-x-l {
+  left: 24%;
+  top: 28%;
+  animation: vs-s3-r-x 520ms ease-out both;
+}
+
+.vs-s3-r-ok-l {
+  left: 24%;
+  top: 28%;
+  color: oklch(0.42 0.08 145);
+  animation: vs-s3-r-ok 400ms ease-out 360ms both;
+}
+
+.vs-s3-r-x-m {
+  left: 48%;
+  top: 36%;
+  animation: vs-s3-r-x 520ms ease-out 430ms both;
+}
+
+.vs-s3-r-ok-m {
+  left: 48%;
+  top: 36%;
+  color: oklch(0.42 0.08 145);
+  animation: vs-s3-r-ok 400ms ease-out 780ms both;
+}
+
+.vs-s3-r-x-r {
+  left: 70%;
+  top: 26%;
+  animation: vs-s3-r-x 520ms ease-out 860ms both;
+}
+
+.vs-s3-r-ok-r {
+  left: 70%;
+  top: 26%;
+  color: oklch(0.42 0.08 145);
+  animation: vs-s3-r-ok 400ms ease-out 1120ms both;
+}
+
+.vs-s3-r-mute,
+.vs-s3-r-old,
+.vs-s3-r-gold {
+  opacity: 0;
+}
+
+.vs-s3-r-mute-l {
+  animation: vs-s3-r-mute 900ms ease-out both;
+}
+
+.vs-s3-r-old-l {
+  animation: vs-s3-r-old-line 900ms ease-out both;
+}
+
+.vs-s3-r-gold-l {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: vs-s3-gold-draw 420ms ease-out 180ms both;
+}
+
+.vs-s3-r-mute-m {
+  animation: vs-s3-r-mute 900ms ease-out 430ms both;
+}
+
+.vs-s3-r-old-m {
+  animation: vs-s3-r-old-line 900ms ease-out 430ms both;
+}
+
+.vs-s3-r-gold-m {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: vs-s3-gold-draw 420ms ease-out 620ms both;
+}
+
+.vs-s3-r-mute-r {
+  animation: vs-s3-r-mute 900ms ease-out 860ms both;
+}
+
+.vs-s3-r-old-r {
+  animation: vs-s3-r-old-line 900ms ease-out 860ms both;
+}
+
+.vs-s3-r-gold-r {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: vs-s3-gold-draw 300ms ease-out 980ms both;
+}
+
+.vs-s3-route-pulse {
+  opacity: 0;
+  animation: vs-s3-route-pulse 350ms ease-in-out 300ms both;
+}
+
+.vs-s3-rev.is-resolve .vs-s3-r-edit {
+  animation: vs-s3-r-out 600ms ease-out forwards;
+}
+
+@keyframes vs-s3-r-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes vs-s3-r-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes vs-s3-r-mute {
+  0% {
+    opacity: 0;
+  }
+  18% {
+    opacity: 0.62;
+  }
+  70% {
+    opacity: 0.35;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes vs-s3-r-old-line {
+  0% {
+    opacity: 0;
+  }
+  16% {
+    opacity: 0.55;
+  }
+  58% {
+    opacity: 0.2;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes vs-s3-gold-draw {
+  from {
+    opacity: 1;
+    stroke-dashoffset: 1;
+  }
+  to {
+    opacity: 1;
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes vs-s3-r-old-room {
+  0% {
+    opacity: 0;
+  }
+  18% {
+    opacity: 0.7;
+  }
+  55% {
+    opacity: 0.2;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes vs-s3-r-new-room {
+  0% {
+    opacity: 0;
+  }
+  30% {
+    opacity: 0.95;
+  }
+  100% {
+    opacity: 0.75;
+  }
+}
+
+@keyframes vs-s3-r-x {
+  0% {
+    opacity: 0;
+    transform: scale(0.7);
+  }
+  25% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  70% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes vs-s3-r-ok {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes vs-s3-route-pulse {
+  0% {
+    opacity: 0;
+    filter: brightness(1);
+  }
+  40% {
+    opacity: 0.9;
+    filter: brightness(1.15);
+  }
+  100% {
+    opacity: 0;
+    filter: brightness(1);
+  }
+}
+
+.vs-s3-stamp {
+  position: absolute;
+  left: 52%;
+  top: 32%;
+  z-index: 24;
+  transform: translate(-50%, -50%) rotate(-6deg);
+  border: 4px solid var(--wood-dark);
+  background: var(--parchment);
+  padding: 8px 16px;
+  font-size: 16px;
+  letter-spacing: 0.16em;
+  color: var(--ink);
+  box-shadow:
+    inset 0 0 0 3px var(--parchment-dark),
+    0 0 0 3px oklch(0 0 0 / 35%);
+}
+
+.vs-s3-black {
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  background: #000;
+  animation: vs-s3-black-in 550ms linear both;
+}
+
+@keyframes vs-s3-note-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes vs-s3-black-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+

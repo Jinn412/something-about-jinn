@@ -4,6 +4,7 @@ import type { InteractiveItem } from "./types";
 export function resolveHubItem(
   item: InteractiveItem,
   photoStoryComplete: boolean,
+  vaseStoryComplete = false,
 ): InteractiveItem {
   if (item.id === "photo" && photoStoryComplete) {
     return {
@@ -17,6 +18,18 @@ export function resolveHubItem(
     };
   }
 
+  if (item.id === "vase" && vaseStoryComplete) {
+    return {
+      ...item,
+      kind: "main",
+      lines: [
+        "陶瓷上的花纹，已经能看懂了。",
+        "（双击陶瓷，可查看秘密纸条）",
+      ],
+      goToScene: undefined,
+    };
+  }
+
   if (item.id === "vase" && photoStoryComplete) {
     return {
       ...item,
@@ -25,6 +38,16 @@ export function resolveHubItem(
         "陶瓷上的花纹，好像开始能看懂了。",
         "也许值得一探究竟。",
       ],
+      goToScene: "story-vase",
+    };
+  }
+
+  if (item.id === "telescope" && vaseStoryComplete) {
+    return {
+      ...item,
+      kind: "main",
+      lines: ["镜筒里好像有了新的方向。", "也许值得看一看。"],
+      goToScene: "story-telescope",
     };
   }
 

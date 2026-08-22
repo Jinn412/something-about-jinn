@@ -6,6 +6,7 @@ import { DialogueBox } from "../DialogueBox";
 import { ItemZoom } from "../ItemZoom";
 import { HUB_ITEMS } from "@/game/items";
 import { resolveHubItem } from "@/game/photoItems";
+import { isOfficialStoryEntry, withDevStoryEntry } from "@/game/devStories";
 import { merchantIntro, merchantPhotoComplete } from "@/game/dialogue";
 import { useGame } from "@/game/GameContext";
 import type { InteractiveItem } from "@/game/types";
@@ -33,8 +34,11 @@ export function HubScene() {
     unlockStory,
     goToScene,
     photoStoryComplete,
+    vaseStoryComplete,
     pendingPhotoMerchantDialogue,
     clearPhotoMerchantDialogue,
+    enterDevStory,
+    clearDevStoryEntry,
   } = useGame();
   const [dialogueDone, setDialogueDone] = useState(hasMagnifier);
   const [photoDialogueActive, setPhotoDialogueActive] = useState(false);
@@ -52,7 +56,7 @@ export function HubScene() {
 
   const openItem = (item: InteractiveItem) => {
     markInspected(item.id);
-    setZoomed(resolveHubItem(item, photoStoryComplete));
+    setZoomed(withDevStoryEntry(resolveHubItem(item, photoStoryComplete, vaseStoryComplete)));
   };
 
   return (
@@ -142,16 +146,34 @@ export function HubScene() {
         <ItemZoom
           item={zoomed}
           photoStoryComplete={photoStoryComplete}
+          vaseStoryComplete={vaseStoryComplete}
+          showDevMark={
+            Boolean(
+              zoomed.goToScene &&
+                !isOfficialStoryEntry(zoomed.id, photoStoryComplete, vaseStoryComplete),
+            )
+          }
           onClose={() => setZoomed(null)}
           onReplayPhotoStory={() => {
             setZoomed(null);
+            clearDevStoryEntry();
             goToScene("story-photo");
+          }}
+          onReplayVaseStory={() => {
+            setZoomed(null);
+            clearDevStoryEntry();
+            goToScene("story-vase");
           }}
           onEnterStory={(item) => {
             if (!item.goToScene) return;
-            unlockStory(item.id);
             setZoomed(null);
-            goToScene(item.goToScene);
+            if (isOfficialStoryEntry(item.id, photoStoryComplete, vaseStoryComplete)) {
+              clearDevStoryEntry();
+              unlockStory(item.id);
+              goToScene(item.goToScene);
+              return;
+            }
+            enterDevStory(item.goToScene);
           }}
         />
       )}

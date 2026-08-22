@@ -4,16 +4,21 @@ import type { DialogueLine } from "@/game/types";
 interface DialogueBoxProps {
   lines: DialogueLine[];
   onFinish?: () => void;
+  instant?: boolean;
 }
 
 /** Click-through pixel dialogue box. Feed it any DialogueLine[] script. */
-export function DialogueBox({ lines, onFinish }: DialogueBoxProps) {
+export function DialogueBox({ lines, onFinish, instant = false }: DialogueBoxProps) {
   const [index, setIndex] = useState(0);
   const [typed, setTyped] = useState("");
   const line = lines[index];
 
   useEffect(() => {
     if (!line) return;
+    if (instant) {
+      setTyped(line.text);
+      return;
+    }
     setTyped("");
     let i = 0;
     const id = window.setInterval(() => {
@@ -22,7 +27,7 @@ export function DialogueBox({ lines, onFinish }: DialogueBoxProps) {
       if (i >= line.text.length) window.clearInterval(id);
     }, 45);
     return () => window.clearInterval(id);
-  }, [line]);
+  }, [line, instant]);
 
   if (!line) return null;
 

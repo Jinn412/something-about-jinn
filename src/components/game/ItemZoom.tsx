@@ -1,6 +1,7 @@
 import { useState } from "react";
 import hubScene from "@/assets/hub-scene.png";
 import { PhotoSecretNote } from "./story-photo/PhotoSecretNote";
+import { VaseSecretNote } from "./story-vase/VaseSecretNote";
 import type { InteractiveItem } from "@/game/types";
 
 const SCENE_W = 1536;
@@ -12,7 +13,10 @@ interface ItemZoomProps {
   onClose: () => void;
   onEnterStory?: (item: InteractiveItem) => void;
   onReplayPhotoStory?: () => void;
+  onReplayVaseStory?: () => void;
   photoStoryComplete?: boolean;
+  vaseStoryComplete?: boolean;
+  showDevMark?: boolean;
 }
 
 /** Click -> 1:1 pixel zoom of the object, then back to the hub. */
@@ -21,7 +25,10 @@ export function ItemZoom({
   onClose,
   onEnterStory,
   onReplayPhotoStory,
+  onReplayVaseStory,
   photoStoryComplete,
+  vaseStoryComplete,
+  showDevMark,
 }: ItemZoomProps) {
   const [secretNoteOpen, setSecretNoteOpen] = useState(false);
   const crop = item.zoomHotspot ?? item.hotspot;
@@ -29,7 +36,11 @@ export function ItemZoom({
   const bgH = bgW * (SCENE_H / SCENE_W);
   const boxH = (crop.height / 100) * bgH;
   const canEnterStory = Boolean(item.goToScene && onEnterStory);
-  const canSecretNote = item.id === "photo" && photoStoryComplete;
+  const canSecretNote =
+    (item.id === "photo" && photoStoryComplete) || (item.id === "vase" && vaseStoryComplete);
+  const openSecretNote = () => {
+    if (canSecretNote) setSecretNoteOpen(true);
+  };
 
   return (
     <div className="absolute inset-0 z-40 flex items-center justify-center bg-black/70 px-4">
@@ -44,14 +55,14 @@ export function ItemZoom({
                 height={768}
                 loading="lazy"
                 className={`max-h-[46vh] w-auto ${canSecretNote ? "cursor-pointer" : ""}`}
-                onDoubleClick={() => {
-                  if (canSecretNote) setSecretNoteOpen(true);
-                }}
+                onDoubleClick={openSecretNote}
               />
             ) : (
               <div
                 aria-label={item.name}
                 role="img"
+                className={canSecretNote ? "cursor-pointer" : ""}
+                onDoubleClick={openSecretNote}
                 style={{
                   width: BOX_W,
                   height: boxH,
@@ -79,6 +90,7 @@ export function ItemZoom({
                 className="pixel-btn px-5 py-3 text-xs md:text-sm"
               >
                 ▶ 看看
+                {import.meta.env.DEV && showDevMark ? " DEV" : ""}
               </button>
             )}
             <button
@@ -92,12 +104,21 @@ export function ItemZoom({
         </div>
       </div>
 
-      {secretNoteOpen && (
+      {secretNoteOpen && item.id === "photo" && (
         <PhotoSecretNote
           onClose={() => setSecretNoteOpen(false)}
           onReplay={() => {
             setSecretNoteOpen(false);
             onReplayPhotoStory?.();
+          }}
+        />
+      )}
+      {secretNoteOpen && item.id === "vase" && (
+        <VaseSecretNote
+          onClose={() => setSecretNoteOpen(false)}
+          onReplay={() => {
+            setSecretNoteOpen(false);
+            onReplayVaseStory?.();
           }}
         />
       )}

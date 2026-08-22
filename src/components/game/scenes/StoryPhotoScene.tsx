@@ -35,8 +35,10 @@ const SCENE6_SETTLE_MS = 900;
 const SCENE6_HOLD_MS = 900;
 
 export function StoryPhotoScene() {
-  const { completePhotoStory, goToScene, photoStoryComplete } = useGame();
+  const { completePhotoStory, goToScene, photoStoryComplete, isDevStoryEntry, clearDevStoryEntry } =
+    useGame();
   const isReplay = useRef(photoStoryComplete).current;
+  const enteredAsDev = useRef(isDevStoryEntry).current;
   const [step, setStep] = useState(-1);
   const [scene, setScene] = useState<PhotoSceneId>(1);
   const [grasslandReveal, setGrasslandReveal] = useState(false);
@@ -292,6 +294,7 @@ export function StoryPhotoScene() {
     }
 
     if (lineText === SCENE6_LINE_2 && isReplay) {
+      clearDevStoryEntry();
       goToScene("hub");
       return;
     }
@@ -318,7 +321,8 @@ export function StoryPhotoScene() {
   };
 
   const finishStory = () => {
-    if (!isReplay) completePhotoStory();
+    if (!isReplay && !enteredAsDev) completePhotoStory();
+    clearDevStoryEntry();
     goToScene("hub");
   };
 

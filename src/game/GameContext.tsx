@@ -17,6 +17,7 @@ const INITIAL_STATE: GameState = {
   inspectedItems: [],
   unlockedStories: [],
   photoStoryComplete: false,
+  vaseStoryComplete: false,
   pendingPhotoMerchantDialogue: false,
 };
 
@@ -31,7 +32,12 @@ interface GameContextValue extends GameState {
   unlockStory: (id: string) => void;
   addHeart: () => void;
   completePhotoStory: () => void;
+  completeVaseStory: () => void;
   clearPhotoMerchantDialogue: () => void;
+  /** Session-only: this story open came from a DEV test click, not official unlock. */
+  isDevStoryEntry: boolean;
+  enterDevStory: (scene: SceneId) => void;
+  clearDevStoryEntry: () => void;
 }
 
 const GameContext = createContext<GameContextValue | null>(null);
@@ -40,6 +46,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<GameState>(INITIAL_STATE);
   const [scene, setScene] = useState<SceneId>("title");
   const [isFading, setIsFading] = useState(false);
+  const [isDevStoryEntry, setIsDevStoryEntry] = useState(false);
 
   const goToScene = useCallback((next: SceneId) => {
     setIsFading(true);
@@ -82,10 +89,26 @@ export function GameProvider({ children }: { children: ReactNode }) {
             ? s.unlockedStories
             : [...s.unlockedStories, "photo"],
         })),
+      completeVaseStory: () =>
+        setState((s) => ({
+          ...s,
+          vaseStoryComplete: true,
+          hearts: Math.max(s.hearts, 4),
+          unlockedStories: s.unlockedStories.includes("vase")
+            ? s.unlockedStories
+            : [...s.unlockedStories, "vase"],
+        })),
       clearPhotoMerchantDialogue: () =>
         setState((s) => ({ ...s, pendingPhotoMerchantDialogue: false })),
+      isDevStoryEntry,
+      enterDevStory: (next) => {
+        if (!import.meta.env.DEV) return;
+        setIsDevStoryEntry(true);
+        goToScene(next);
+      },
+      clearDevStoryEntry: () => setIsDevStoryEntry(false),
     }),
-    [state, scene, isFading, goToScene],
+    [state, scene, isFading, goToScene, isDevStoryEntry],
   );
 
   return <GameContext.Provider value={value}>{children}</GameContext.Provider>;

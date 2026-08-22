@@ -1,4 +1,4 @@
-export type SceneId = "title" | "setup" | "hub" | "story-photo";
+export type SceneId = "title" | "setup" | "hub" | "story-photo" | "story-vase" | "story-telescope";
 
 export type ItemKind = "main" | "locked" | "egg";
 
@@ -38,6 +38,8 @@ export interface GameState {
   unlockedStories: string[];
   /** Photo Story 01 fully completed */
   photoStoryComplete: boolean;
+  /** Vase Story fully completed */
+  vaseStoryComplete: boolean;
   /** One-shot merchant dialogue after returning from Photo Story */
   pendingPhotoMerchantDialogue: boolean;
 }
