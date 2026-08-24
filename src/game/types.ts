@@ -42,4 +42,6 @@ export interface GameState {
   vaseStoryComplete: boolean;
   /** One-shot merchant dialogue after returning from Photo Story */
   pendingPhotoMerchantDialogue: boolean;
+  /** One-shot merchant dialogue after returning from Vase Story */
+  pendingVaseMerchantDialogue: boolean;
 }

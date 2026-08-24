@@ -19,6 +19,7 @@ const INITIAL_STATE: GameState = {
   photoStoryComplete: false,
   vaseStoryComplete: false,
   pendingPhotoMerchantDialogue: false,
+  pendingVaseMerchantDialogue: false,
 };
 
 interface GameContextValue extends GameState {
@@ -34,6 +35,7 @@ interface GameContextValue extends GameState {
   completePhotoStory: () => void;
   completeVaseStory: () => void;
   clearPhotoMerchantDialogue: () => void;
+  clearVaseMerchantDialogue: () => void;
   /** Session-only: this story open came from a DEV test click, not official unlock. */
   isDevStoryEntry: boolean;
   enterDevStory: (scene: SceneId) => void;
@@ -93,13 +95,16 @@ export function GameProvider({ children }: { children: ReactNode }) {
         setState((s) => ({
           ...s,
           vaseStoryComplete: true,
-          hearts: Math.max(s.hearts, 4),
+          pendingVaseMerchantDialogue: true,
+          hearts: Math.max(s.hearts, 6),
           unlockedStories: s.unlockedStories.includes("vase")
             ? s.unlockedStories
             : [...s.unlockedStories, "vase"],
         })),
       clearPhotoMerchantDialogue: () =>
         setState((s) => ({ ...s, pendingPhotoMerchantDialogue: false })),
+      clearVaseMerchantDialogue: () =>
+        setState((s) => ({ ...s, pendingVaseMerchantDialogue: false })),
       isDevStoryEntry,
       enterDevStory: (next) => {
         if (!import.meta.env.DEV) return;

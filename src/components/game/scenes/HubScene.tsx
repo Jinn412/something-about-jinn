@@ -7,7 +7,7 @@ import { ItemZoom } from "../ItemZoom";
 import { HUB_ITEMS } from "@/game/items";
 import { resolveHubItem } from "@/game/photoItems";
 import { isOfficialStoryEntry, withDevStoryEntry } from "@/game/devStories";
-import { merchantIntro, merchantPhotoComplete } from "@/game/dialogue";
+import { merchantIntro, merchantPhotoComplete, merchantVaseComplete } from "@/game/dialogue";
 import { useGame } from "@/game/GameContext";
 import type { InteractiveItem } from "@/game/types";
 
@@ -36,16 +36,20 @@ export function HubScene() {
     photoStoryComplete,
     vaseStoryComplete,
     pendingPhotoMerchantDialogue,
+    pendingVaseMerchantDialogue,
     clearPhotoMerchantDialogue,
+    clearVaseMerchantDialogue,
     enterDevStory,
     clearDevStoryEntry,
   } = useGame();
   const [dialogueDone, setDialogueDone] = useState(hasMagnifier);
   const [photoDialogueActive, setPhotoDialogueActive] = useState(false);
+  const [vaseDialogueActive, setVaseDialogueActive] = useState(false);
   const [zoomed, setZoomed] = useState<InteractiveItem | null>(null);
 
   const script = useMemo(() => merchantIntro(playerName), [playerName]);
   const photoCompleteScript = useMemo(() => merchantPhotoComplete(), []);
+  const vaseCompleteScript = useMemo(() => merchantVaseComplete(), []);
 
   useEffect(() => {
     if (pendingPhotoMerchantDialogue && hasMagnifier) {
@@ -53,6 +57,13 @@ export function HubScene() {
       setPhotoDialogueActive(true);
     }
   }, [pendingPhotoMerchantDialogue, hasMagnifier]);
+
+  useEffect(() => {
+    if (pendingVaseMerchantDialogue && hasMagnifier) {
+      setDialogueDone(true);
+      setVaseDialogueActive(true);
+    }
+  }, [pendingVaseMerchantDialogue, hasMagnifier]);
 
   const openItem = (item: InteractiveItem) => {
     markInspected(item.id);
@@ -92,7 +103,7 @@ export function HubScene() {
       <RainOverlay opacity={0.45} />
 
       {/* interactive hotspots — configured in src/game/items.ts */}
-      {dialogueDone && !photoDialogueActive && (
+      {dialogueDone && !photoDialogueActive && !vaseDialogueActive && (
         <div className="absolute inset-0 z-30">
           {HUB_ITEMS.map((item) => (
             <button
@@ -138,6 +149,16 @@ export function HubScene() {
           onFinish={() => {
             clearPhotoMerchantDialogue();
             setPhotoDialogueActive(false);
+          }}
+        />
+      )}
+
+      {vaseDialogueActive && (
+        <DialogueBox
+          lines={vaseCompleteScript}
+          onFinish={() => {
+            clearVaseMerchantDialogue();
+            setVaseDialogueActive(false);
           }}
         />
       )}

@@ -1,29 +1,29 @@
-import { useGame } from "@/game/GameContext";
+import { useState } from "react";
+import { TelescopeObservation } from "../story-telescope/TelescopeObservation";
+import { TelescopeSearch } from "../story-telescope/TelescopeSearch";
 
-/** DEV-only stub so Hub can open Telescope without an official story yet. */
+type TelescopePhase = "search" | "leaving" | "observation";
+
+/** Telescope Story: Scene 01 search → Scene 02 observation. */
 export function StoryTelescopeScene() {
-  const { goToScene, clearDevStoryEntry } = useGame();
+  const [phase, setPhase] = useState<TelescopePhase>("search");
 
   return (
-    <div className="relative flex h-full w-full items-center justify-center bg-[oklch(0.16_0.03_250)]">
-      <div className="pixel-frame max-w-md p-6">
-        <div className="pixel-panel px-5 py-5 text-sm leading-8">
-          <p className="mb-3 text-xs text-plum">DEV</p>
-          <p>Telescope Story 尚未制作。</p>
+    <div className="relative h-full w-full overflow-hidden">
+      {(phase === "leaving" || phase === "observation") && (
+        <div className="absolute inset-0 z-[1]">
+          <TelescopeObservation revealed={phase === "observation"} />
         </div>
-        <div className="mt-4 flex justify-end">
-          <button
-            type="button"
-            className="pixel-btn px-5 py-3 text-xs"
-            onClick={() => {
-              clearDevStoryEntry();
-              goToScene("hub");
-            }}
-          >
-            返回
-          </button>
+      )}
+      {(phase === "search" || phase === "leaving") && (
+        <div className={`absolute inset-0 z-[2] ${phase === "leaving" ? "pointer-events-none" : ""}`}>
+          <TelescopeSearch
+            exiting={phase === "leaving"}
+            onContinue={() => setPhase("leaving")}
+            onExited={() => setPhase("observation")}
+          />
         </div>
-      </div>
+      )}
     </div>
   );
 }

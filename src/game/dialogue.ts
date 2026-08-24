@@ -29,3 +29,14 @@ export function merchantPhotoComplete(): DialogueLine[] {
     { speaker: MERCHANT, text: "看来，我们找到了她的第一块碎片。" },
   ];
 }
+
+/** After Vase Story is completed and the player returns to the hub. */
+export function merchantVaseComplete(): DialogueLine[] {
+  return [
+    {
+      speaker: MERCHANT,
+      text: "两年多啊……看来她已经知道把很多人的声音，慢慢变成一个能落地的答案了。",
+    },
+    { speaker: MERCHANT, text: "好了。那架望远镜，好像也愿意让你看看了。" },
+  ];
+}

@@ -1,0 +1,580 @@
+/* Telescope Story Scene 01 — searching / focus */
+
+.telescope-search {
+  background: oklch(0.07 0.02 250);
+  color: var(--parchment);
+}
+
+.telescope-dialogue .pixel-frame:empty {
+  display: none;
+}
+
+.telescope-stage {
+  --telescope-lens-center-x: 50%;
+  --telescope-lens-center-y: 42%;
+  --telescope-lens-size: 0px;
+  --ts-cx: 50%;
+  --ts-cy: 42%;
+}
+
+.telescope-sky {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  object-fit: cover;
+  object-position: center;
+}
+
+.telescope-sky-outer {
+  z-index: 0;
+  filter: blur(5px) brightness(0.55) contrast(0.85) saturate(0.82);
+}
+
+.telescope-sky-focused {
+  z-index: 3;
+  opacity: 1;
+  clip-path: circle(var(--telescope-lens-size) at var(--telescope-lens-center-x) var(--telescope-lens-center-y));
+}
+
+.telescope-sky-vignette {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse 70% 62% at 50% 42%,
+    transparent 32%,
+    oklch(0.05 0.02 250 / 0.14) 68%,
+    oklch(0.04 0.018 55 / 0.38) 100%
+  );
+}
+
+.telescope-label {
+  position: absolute;
+  left: 50%;
+  top: 6.6%;
+  z-index: 4;
+  margin: 0;
+  transform: translateX(-50%);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  color: oklch(0.72 0.04 78 / 78%);
+}
+
+.telescope-scope-shell {
+  position: absolute;
+  left: var(--ts-cx);
+  top: var(--ts-cy);
+  z-index: 2;
+  height: 64%;
+  aspect-ratio: 1;
+  background: transparent;
+  transform: translate(-50%, -50%);
+}
+
+.telescope-scope-shell.is-acquired {
+  animation: telescope-acquire 280ms ease-out both;
+}
+
+.telescope-outer-ring {
+  position: absolute;
+  inset: 5%;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle closest-side at 50% 50%,
+    transparent 95.5%,
+    oklch(0.14 0.022 52) 96.4%,
+    oklch(0.11 0.02 50) 100%
+  );
+}
+
+.telescope-mechanical-ring {
+  position: absolute;
+  inset: 7%;
+  overflow: hidden;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle closest-side at 50% 50%,
+    transparent 91%,
+    oklch(0.28 0.042 58) 92.2%,
+    oklch(0.33 0.048 62) 96.5%,
+    oklch(0.26 0.038 56) 100%
+  );
+}
+
+.telescope-tick {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 2px;
+  height: 50%;
+  margin-left: -1px;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    oklch(0.26 0.03 58 / 38%) 0,
+    oklch(0.26 0.03 58 / 38%) 6px,
+    transparent 6px
+  );
+  transform-origin: 50% 100%;
+}
+
+.telescope-tick.is-cardinal {
+  background: linear-gradient(
+    to bottom,
+    oklch(0.28 0.03 60 / 48%) 0,
+    oklch(0.28 0.03 60 / 48%) 9px,
+    transparent 9px
+  );
+}
+
+.telescope-inner-ring {
+  position: absolute;
+  inset: 10.8%;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle closest-side at 50% 50%,
+    transparent 97%,
+    oklch(0.09 0.016 50) 97.8%,
+    oklch(0.07 0.014 48) 100%
+  );
+}
+
+.telescope-viewport {
+  position: absolute;
+  inset: 12%;
+  overflow: visible;
+  border-radius: 50%;
+  background: transparent;
+  pointer-events: none;
+  box-shadow: inset 0 0 5px oklch(0 0 0 / 14%);
+}
+
+.telescope-lens-overlay {
+  position: absolute;
+  left: var(--ts-cx);
+  top: var(--ts-cy);
+  z-index: 4;
+  height: 48.64%;
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.telescope-signal-layer {
+  position: absolute;
+  inset: 0;
+}
+
+.telescope-signal-group {
+  position: absolute;
+  inset: 0;
+  transform: translateX(3.4%);
+}
+
+.telescope-constellation {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.telescope-constellation line {
+  fill: none;
+  stroke: oklch(0.78 0.028 78 / 0.3);
+  stroke-width: 1px;
+  stroke-linecap: round;
+}
+
+.telescope-constellation.is-revealing line {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: telescope-line-draw 900ms ease-out forwards;
+}
+
+.telescope-signal-node {
+  position: absolute;
+  width: 0;
+  height: 0;
+}
+
+.telescope-signal-star {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: oklch(0.9 0.035 86);
+  box-shadow: 0 0 3px oklch(0.86 0.04 82 / 28%);
+  opacity: var(--ts-star-opacity, 1);
+  transform: translate(-50%, -50%) scale(var(--ts-star-scale, 1));
+  filter: blur(var(--ts-star-blur, 0px)) brightness(var(--ts-star-brightness, 1));
+}
+
+.telescope-signal {
+  position: absolute;
+  letter-spacing: 0.12em;
+  color: oklch(0.86 0.04 82);
+  white-space: nowrap;
+}
+
+.telescope-signal.is-high {
+  font-size: 22px;
+}
+
+.telescope-signal.is-mid {
+  font-size: 13px;
+}
+
+.telescope-signal.is-right {
+  left: 10px;
+  top: 0;
+  transform: translate(0, -50%);
+}
+
+.telescope-signal.is-left {
+  right: 10px;
+  top: 0;
+  transform: translate(0, -50%);
+}
+
+.telescope-signal.is-above {
+  left: 0;
+  bottom: 8px;
+  transform: translate(-50%, 0);
+}
+
+.telescope-signal.is-below {
+  left: 0;
+  top: 8px;
+  transform: translate(-50%, 0);
+}
+
+.telescope-lens-vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 50% 50%,
+    transparent 0%,
+    transparent 75%,
+    oklch(0.06 0.02 50 / 0.05) 90%,
+    oklch(0.05 0.02 48 / 0.12) 100%
+  );
+}
+
+.telescope-status {
+  position: absolute;
+  left: 50%;
+  top: 76.4%;
+  z-index: 4;
+  margin: 0;
+  transform: translateX(-50%);
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  color: oklch(0.74 0.04 78 / 70%);
+  animation: telescope-breathe 2.6s ease-in-out infinite;
+}
+
+.telescope-status.is-acquired {
+  animation: telescope-status-settle 1.5s ease-out forwards;
+  color: oklch(0.84 0.05 80);
+}
+
+.telescope-focus-control {
+  position: absolute;
+  left: 50%;
+  top: 82.4%;
+  z-index: 5;
+  display: flex;
+  width: 34%;
+  transform: translateX(-50%);
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.telescope-focus-control label {
+  font-size: 11px;
+  letter-spacing: 0.28em;
+  color: oklch(0.78 0.04 80 / 82%);
+}
+
+.telescope-focus-control input[type="range"] {
+  width: 100%;
+  height: 10px;
+  appearance: none;
+  cursor: pointer;
+  background: oklch(0.22 0.02 70);
+  box-shadow:
+    inset 0 0 0 2px oklch(0.34 0.03 70),
+    2px 2px 0 oklch(0 0 0 / 35%);
+}
+
+.telescope-focus-control input[type="range"]::-webkit-slider-thumb {
+  width: 16px;
+  height: 18px;
+  appearance: none;
+  border: 2px solid oklch(0.28 0.03 60);
+  background: oklch(0.78 0.06 82);
+  box-shadow: 2px 2px 0 oklch(0 0 0 / 40%);
+}
+
+.telescope-focus-control input[type="range"]::-moz-range-thumb {
+  width: 16px;
+  height: 18px;
+  border: 2px solid oklch(0.28 0.03 60);
+  background: oklch(0.78 0.06 82);
+  box-shadow: 2px 2px 0 oklch(0 0 0 / 40%);
+}
+
+@keyframes telescope-breathe {
+  0%,
+  100% {
+    opacity: 0.38;
+  }
+  50% {
+    opacity: 0.78;
+  }
+}
+
+@keyframes telescope-acquire {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+  }
+  40% {
+    transform: translate(-50%, -50%) scale(1.01);
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+@keyframes telescope-line-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes telescope-status-settle {
+  0% {
+    opacity: 1;
+  }
+  55% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.4;
+  }
+}
+
+.telescope-continue {
+  margin-top: 4px;
+  padding: 5px 12px;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  opacity: 0.74;
+  background: oklch(0.3 0.045 58);
+}
+
+.telescope-continue:hover {
+  background: oklch(0.36 0.05 60);
+}
+
+.telescope-search.is-leaving {
+  background: transparent;
+}
+
+.telescope-search.is-leaving .telescope-signal-layer,
+.telescope-search.is-leaving .telescope-focus-control,
+.telescope-search.is-leaving .telescope-label {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 300ms ease-out;
+}
+
+.telescope-search.is-leaving .telescope-status {
+  animation: none;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 300ms ease-out;
+}
+
+.telescope-search.is-leaving .telescope-scope-shell {
+  opacity: 0;
+  transition: opacity 500ms ease-out 280ms;
+}
+
+.telescope-search.is-leaving .telescope-sky-outer,
+.telescope-search.is-leaving .telescope-sky-vignette {
+  opacity: 0;
+  transition: opacity 720ms ease-out 280ms;
+}
+
+.telescope-search.is-leaving .telescope-sky-focused {
+  transform-origin: var(--telescope-lens-center-x) var(--telescope-lens-center-y);
+  transform: scale(2.75);
+  opacity: 0;
+  transition:
+    transform 850ms ease-in 280ms,
+    opacity 800ms ease-out 280ms;
+}
+
+.telescope-search.is-leaving .telescope-lens-overlay {
+  transform: translate(-50%, -50%) scale(2.75);
+  opacity: 0;
+  transition:
+    transform 850ms ease-in 280ms,
+    opacity 400ms ease-out 280ms;
+}
+
+/* Scene 02 — OBSERVATION 01 · NTU */
+
+.telescope-observation {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  background: oklch(0.07 0.02 250);
+  color: oklch(0.22 0.03 70);
+}
+
+.telescope-observation.is-entering {
+  animation: telescope-obs-in 1050ms ease-out forwards;
+}
+
+.telescope-observation.is-revealed {
+  opacity: 1;
+}
+
+.telescope-obs-sky {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  object-fit: cover;
+  object-position: center;
+}
+
+.telescope-obs-label {
+  position: absolute;
+  left: 4.6%;
+  top: 10.2%;
+  z-index: 4;
+  margin: 0;
+  pointer-events: none;
+  opacity: 0;
+  animation: telescope-obs-label-in 500ms ease-out 420ms forwards;
+}
+
+.telescope-obs-label p {
+  margin: 0;
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  color: oklch(0.26 0.035 72);
+  text-shadow: 0 1px 0 oklch(0.97 0.02 90 / 42%);
+}
+
+.telescope-obs-label p:last-child {
+  margin-top: 5px;
+  font-size: 9px;
+  letter-spacing: 0.16em;
+  color: oklch(0.28 0.03 70 / 80%);
+}
+
+.telescope-obs-topics {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+}
+
+.telescope-topic {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 16px;
+  letter-spacing: 0.08em;
+  color: oklch(0.18 0.03 62);
+  text-shadow: 0 1px 0 oklch(0.97 0.02 90 / 38%);
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateY(5px);
+  animation: telescope-topic-in 320ms ease-out both;
+}
+
+.telescope-topic:nth-child(1) {
+  animation-delay: 0ms;
+}
+
+.telescope-topic:nth-child(2) {
+  animation-delay: 400ms;
+}
+
+.telescope-topic:nth-child(3) {
+  animation-delay: 800ms;
+}
+
+.telescope-topic:nth-child(4) {
+  animation-delay: 1200ms;
+}
+
+.telescope-topic:nth-child(5) {
+  animation-delay: 1600ms;
+}
+
+.telescope-topic-mark {
+  display: block;
+  width: 4px;
+  height: 4px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: oklch(0.28 0.04 68);
+}
+
+@keyframes telescope-obs-in {
+  0% {
+    opacity: 0;
+  }
+  30% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes telescope-obs-label-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes telescope-topic-in {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
