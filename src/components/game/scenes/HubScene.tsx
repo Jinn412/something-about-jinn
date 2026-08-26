@@ -7,9 +7,12 @@ import { ItemZoom } from "../ItemZoom";
 import { HUB_ITEMS } from "@/game/items";
 import { resolveHubItem } from "@/game/photoItems";
 import { isOfficialStoryEntry, withDevStoryEntry } from "@/game/devStories";
-import { merchantIntro, merchantPhotoComplete, merchantVaseComplete } from "@/game/dialogue";
+import { merchantIntro, merchantPhotoComplete, merchantVaseComplete, merchantTelescopeComplete } from "@/game/dialogue";
+import { isFinalPreview } from "@/game/finalPreview";
 import { useGame } from "@/game/GameContext";
-import type { InteractiveItem } from "@/game/types";
+import { FinalSequence } from "../FinalSequence";
+import type { FinalSequencePhase, InteractiveItem } from "@/game/types";
+import "../final-sequence.css";
 
 const MAGNIFIER_CURSOR =
   "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' shape-rendering='crispEdges' viewBox='0 0 16 16'%3E%3Cpath fill='%232b1b13' d='M4 1h6v1H4zM3 2h1v1H3zM10 2h1v1h-1zM2 3h1v6H2zM11 3h1v6h-1zM3 9h1v1H3zM10 9h1v1h-1zM4 10h6v1H4zM9 11h2v2H9zM10 13h3v3h-3z'/%3E%3Cpath fill='%23bcd8e8' d='M4 2h6v1H4zM3 3h8v6H3zM4 9h6v1H4z'/%3E%3C/svg%3E\") 8 8, pointer";
@@ -25,7 +28,14 @@ const MERCHANT_SCENE = {
   height: "51%",
 } as const;
 
-export function HubScene() {
+export function HubScene({
+  onPreviewPhase,
+  onExitPreview,
+}: {
+  onPreviewPhase?: (phase: FinalSequencePhase) => void;
+  onExitPreview?: () => void;
+}) {
+  const preview = isFinalPreview();
   const {
     playerName,
     giveMagnifier,
@@ -33,23 +43,39 @@ export function HubScene() {
     markInspected,
     unlockStory,
     goToScene,
+    isFading,
     photoStoryComplete,
     vaseStoryComplete,
+    telescopeStoryComplete,
     pendingPhotoMerchantDialogue,
     pendingVaseMerchantDialogue,
+    pendingTelescopeMerchantDialogue,
     clearPhotoMerchantDialogue,
     clearVaseMerchantDialogue,
+    clearTelescopeMerchantDialogue,
+    markSideItemViewed,
+    tryGrantFinalHeart,
+    startFinalSequence,
+    hearts,
+    finalRewardReady,
+    finalSequenceStarted,
+    finalSequenceComplete,
+    finalSequencePhase,
     enterDevStory,
     clearDevStoryEntry,
   } = useGame();
-  const [dialogueDone, setDialogueDone] = useState(hasMagnifier);
+  const [dialogueDone, setDialogueDone] = useState(hasMagnifier || preview);
   const [photoDialogueActive, setPhotoDialogueActive] = useState(false);
   const [vaseDialogueActive, setVaseDialogueActive] = useState(false);
+  const [telescopeDialogueActive, setTelescopeDialogueActive] = useState(false);
   const [zoomed, setZoomed] = useState<InteractiveItem | null>(null);
+  const [previewSequenceOn, setPreviewSequenceOn] = useState(false);
+  const [previewPhase, setPreviewPhase] = useState<FinalSequencePhase>("none");
 
   const script = useMemo(() => merchantIntro(playerName), [playerName]);
   const photoCompleteScript = useMemo(() => merchantPhotoComplete(), []);
   const vaseCompleteScript = useMemo(() => merchantVaseComplete(), []);
+  const telescopeCompleteScript = useMemo(() => merchantTelescopeComplete(), []);
 
   useEffect(() => {
     if (pendingPhotoMerchantDialogue && hasMagnifier) {
@@ -65,10 +91,81 @@ export function HubScene() {
     }
   }, [pendingVaseMerchantDialogue, hasMagnifier]);
 
+  useEffect(() => {
+    if (pendingTelescopeMerchantDialogue && hasMagnifier) {
+      setDialogueDone(true);
+      setTelescopeDialogueActive(true);
+    }
+  }, [pendingTelescopeMerchantDialogue, hasMagnifier]);
+
+  const merchantBusy =
+    photoDialogueActive ||
+    vaseDialogueActive ||
+    telescopeDialogueActive ||
+    pendingPhotoMerchantDialogue ||
+    pendingVaseMerchantDialogue ||
+    pendingTelescopeMerchantDialogue;
+  const balloonPhase = preview ? previewPhase : finalSequencePhase;
+  const showCartOcclusion =
+    balloonPhase === "celebration" ||
+    balloonPhase === "celebration-complete" ||
+    balloonPhase === "hold" ||
+    balloonPhase === "fade" ||
+    balloonPhase === "end-title" ||
+    balloonPhase === "complete";
+  const endingLocked =
+    preview ||
+    (hearts >= 10 && finalRewardReady) ||
+    finalSequenceStarted ||
+    finalSequenceComplete;
+  const hubIdle = dialogueDone && !merchantBusy && !zoomed && !isFading && !endingLocked;
+
   const openItem = (item: InteractiveItem) => {
+    if (preview || endingLocked) return;
     markInspected(item.id);
-    setZoomed(withDevStoryEntry(resolveHubItem(item, photoStoryComplete, vaseStoryComplete)));
+    if (item.kind === "egg") markSideItemViewed(item.id);
+    setZoomed(
+      withDevStoryEntry(
+        resolveHubItem(item, photoStoryComplete, vaseStoryComplete, telescopeStoryComplete),
+      ),
+    );
   };
+
+  useEffect(() => {
+    if (preview) return;
+    if (!hubIdle) return;
+    tryGrantFinalHeart();
+  }, [preview, hubIdle, tryGrantFinalHeart]);
+
+  useEffect(() => {
+    if (preview) return;
+    if (hearts < 10 || !finalRewardReady) return;
+    if (finalSequenceStarted || finalSequenceComplete) return;
+    if (!dialogueDone || merchantBusy || zoomed || isFading) return;
+    const id = window.setTimeout(() => startFinalSequence(), 420 + 850);
+    return () => window.clearTimeout(id);
+  }, [
+    preview,
+    hearts,
+    finalRewardReady,
+    finalSequenceStarted,
+    finalSequenceComplete,
+    dialogueDone,
+    merchantBusy,
+    zoomed,
+    isFading,
+    startFinalSequence,
+  ]);
+
+  useEffect(() => {
+    if (!preview) return;
+    const id = window.setTimeout(() => {
+      setPreviewSequenceOn(true);
+      setPreviewPhase("merchant");
+      onPreviewPhase?.("merchant");
+    }, 850);
+    return () => window.clearTimeout(id);
+  }, [preview, onPreviewPhase]);
 
   return (
     <div className="relative h-full w-full overflow-hidden bg-[oklch(0.22_0.03_250)]">
@@ -80,6 +177,32 @@ export function HubScene() {
         className="absolute inset-0 h-full w-full object-cover"
       />
 
+      {showCartOcclusion && (
+        <div
+          className="hub-cart-occlusion pointer-events-none absolute inset-0 z-[8] flex items-center justify-center overflow-hidden"
+          aria-hidden
+        >
+          <div className="relative aspect-[1536/1024] h-auto min-h-full w-auto min-w-full">
+            <img
+              src={hubScene}
+              alt=""
+              width={1536}
+              height={1024}
+              draggable={false}
+              className="hub-cart-occlusion-cart absolute inset-0 h-full w-full object-cover"
+            />
+            <img
+              src={hubScene}
+              alt=""
+              width={1536}
+              height={1024}
+              draggable={false}
+              className="hub-cart-occlusion-pig absolute inset-0 h-full w-full object-cover"
+            />
+          </div>
+        </div>
+      )}
+
       {/* Scene-aligned layer — same object-cover box as hub-scene.png (1536×1024) */}
       <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center overflow-hidden">
         <div className="relative aspect-[1536/1024] h-auto min-h-full w-auto min-w-full">
@@ -89,7 +212,7 @@ export function HubScene() {
             width={MERCHANT_W}
             height={MERCHANT_H}
             loading="lazy"
-            className="absolute"
+            className={`absolute${(preview ? previewPhase : finalSequencePhase) === "celebration" ? " final-merchant-bob" : ""}`}
             style={{
               left: MERCHANT_SCENE.left,
               bottom: MERCHANT_SCENE.bottom,
@@ -103,7 +226,11 @@ export function HubScene() {
       <RainOverlay opacity={0.45} />
 
       {/* interactive hotspots — configured in src/game/items.ts */}
-      {dialogueDone && !photoDialogueActive && !vaseDialogueActive && (
+      {dialogueDone &&
+        !photoDialogueActive &&
+        !vaseDialogueActive &&
+        !telescopeDialogueActive &&
+        !endingLocked && (
         <div className="absolute inset-0 z-30">
           {HUB_ITEMS.map((item) => (
             <button
@@ -163,15 +290,31 @@ export function HubScene() {
         />
       )}
 
-      {zoomed && (
+      {telescopeDialogueActive && (
+        <DialogueBox
+          lines={telescopeCompleteScript}
+          onFinish={() => {
+            clearTelescopeMerchantDialogue();
+            setTelescopeDialogueActive(false);
+          }}
+        />
+      )}
+
+      {zoomed && !endingLocked && (
         <ItemZoom
           item={zoomed}
           photoStoryComplete={photoStoryComplete}
           vaseStoryComplete={vaseStoryComplete}
+          telescopeStoryComplete={telescopeStoryComplete}
           showDevMark={
             Boolean(
               zoomed.goToScene &&
-                !isOfficialStoryEntry(zoomed.id, photoStoryComplete, vaseStoryComplete),
+                !isOfficialStoryEntry(
+                  zoomed.id,
+                  photoStoryComplete,
+                  vaseStoryComplete,
+                  telescopeStoryComplete,
+                ),
             )
           }
           onClose={() => setZoomed(null)}
@@ -185,10 +328,22 @@ export function HubScene() {
             clearDevStoryEntry();
             goToScene("story-vase");
           }}
+          onReplayTelescopeStory={() => {
+            setZoomed(null);
+            clearDevStoryEntry();
+            goToScene("story-telescope");
+          }}
           onEnterStory={(item) => {
             if (!item.goToScene) return;
             setZoomed(null);
-            if (isOfficialStoryEntry(item.id, photoStoryComplete, vaseStoryComplete)) {
+            if (
+              isOfficialStoryEntry(
+                item.id,
+                photoStoryComplete,
+                vaseStoryComplete,
+                telescopeStoryComplete,
+              )
+            ) {
               clearDevStoryEntry();
               unlockStory(item.id);
               goToScene(item.goToScene);
@@ -198,6 +353,19 @@ export function HubScene() {
           }}
         />
       )}
+
+      {preview
+        ? previewSequenceOn && (
+            <FinalSequence
+              preview
+              onPhaseChange={(phase) => {
+                setPreviewPhase(phase);
+                onPreviewPhase?.(phase);
+              }}
+              onExitPreview={onExitPreview}
+            />
+          )
+        : finalSequenceStarted && <FinalSequence />}
     </div>
   );
 }

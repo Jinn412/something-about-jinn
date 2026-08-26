@@ -67,3 +67,12 @@ export const HUB_ITEMS: InteractiveItem[] = [
     lines: ["一排小玩偶，摆得整整齐齐。", "Jinn 大概走到哪里都会捡一个回家。"],
   },
 ];
+
+export const MAIN_STORY_ITEM_IDS = ["photo", "vase", "telescope"] as const;
+
+/** Non-story Hub props (`kind: "egg"`). Derived from HUB_ITEMS so IDs stay in sync. */
+export const SIDE_ITEM_IDS = HUB_ITEMS.filter((item) => item.kind === "egg").map((item) => item.id);
+
+export function isHubSideItem(id: string) {
+  return SIDE_ITEM_IDS.includes(id);
+}

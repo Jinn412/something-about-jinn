@@ -6,7 +6,8 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import type { GameState, SceneId } from "./types";
+import type { FinalSequencePhase, GameState, SceneId } from "./types";
+import { isHubSideItem } from "./items";
 
 const INITIAL_STATE: GameState = {
   playerName: "",
@@ -18,8 +19,15 @@ const INITIAL_STATE: GameState = {
   unlockedStories: [],
   photoStoryComplete: false,
   vaseStoryComplete: false,
+  telescopeStoryComplete: false,
   pendingPhotoMerchantDialogue: false,
   pendingVaseMerchantDialogue: false,
+  pendingTelescopeMerchantDialogue: false,
+  viewedSideItems: [],
+  finalRewardReady: false,
+  finalSequenceStarted: false,
+  finalSequenceComplete: false,
+  finalSequencePhase: "none",
 };
 
 interface GameContextValue extends GameState {
@@ -34,8 +42,17 @@ interface GameContextValue extends GameState {
   addHeart: () => void;
   completePhotoStory: () => void;
   completeVaseStory: () => void;
+  completeTelescopeStory: () => void;
   clearPhotoMerchantDialogue: () => void;
   clearVaseMerchantDialogue: () => void;
+  clearTelescopeMerchantDialogue: () => void;
+  markSideItemViewed: (id: string) => void;
+  tryGrantFinalHeart: () => void;
+  startFinalSequence: () => void;
+  setFinalSequencePhase: (phase: FinalSequencePhase) => void;
+  completeFinalSequence: () => void;
+  /** Clear this run's progression and return to the title / New Game screen. */
+  resetGame: () => void;
   /** Session-only: this story open came from a DEV test click, not official unlock. */
   isDevStoryEntry: boolean;
   enterDevStory: (scene: SceneId) => void;
@@ -56,6 +73,49 @@ export function GameProvider({ children }: { children: ReactNode }) {
       setScene(next);
       window.setTimeout(() => setIsFading(false), 220);
     }, 700);
+  }, []);
+
+  const startFinalSequence = useCallback(() => {
+    setState((s) => {
+      if (s.finalSequenceStarted || s.finalSequenceComplete) return s;
+      if (s.hearts < 10 || !s.finalRewardReady) return s;
+      return {
+        ...s,
+        finalSequenceStarted: true,
+        finalSequencePhase: "merchant",
+      };
+    });
+  }, []);
+
+  const setFinalSequencePhase = useCallback((phase: FinalSequencePhase) => {
+    setState((s) => {
+      if (!s.finalSequenceStarted || s.finalSequenceComplete) return s;
+      if (s.finalSequencePhase === phase) return s;
+      return { ...s, finalSequencePhase: phase };
+    });
+  }, []);
+
+  const completeFinalSequence = useCallback(() => {
+    setState((s) => {
+      if (s.finalSequenceComplete) return s;
+      return {
+        ...s,
+        finalSequenceComplete: true,
+        finalSequencePhase: "complete",
+      };
+    });
+  }, []);
+
+  const resetGame = useCallback(() => {
+    setState({
+      ...INITIAL_STATE,
+      inspectedItems: [],
+      unlockedStories: [],
+      viewedSideItems: [],
+    });
+    setScene("title");
+    setIsFading(false);
+    setIsDevStoryEntry(false);
   }, []);
 
   const value = useMemo<GameContextValue>(
@@ -101,10 +161,47 @@ export function GameProvider({ children }: { children: ReactNode }) {
             ? s.unlockedStories
             : [...s.unlockedStories, "vase"],
         })),
+      completeTelescopeStory: () =>
+        setState((s) => {
+          if (s.telescopeStoryComplete) return s;
+          return {
+            ...s,
+            telescopeStoryComplete: true,
+            pendingTelescopeMerchantDialogue: true,
+            hearts: Math.max(s.hearts, 9),
+            unlockedStories: s.unlockedStories.includes("telescope")
+              ? s.unlockedStories
+              : [...s.unlockedStories, "telescope"],
+          };
+        }),
       clearPhotoMerchantDialogue: () =>
         setState((s) => ({ ...s, pendingPhotoMerchantDialogue: false })),
       clearVaseMerchantDialogue: () =>
         setState((s) => ({ ...s, pendingVaseMerchantDialogue: false })),
+      clearTelescopeMerchantDialogue: () =>
+        setState((s) => ({ ...s, pendingTelescopeMerchantDialogue: false })),
+      markSideItemViewed: (id) =>
+        setState((s) => {
+          if (!isHubSideItem(id) || s.viewedSideItems.includes(id)) return s;
+          return { ...s, viewedSideItems: [...s.viewedSideItems, id] };
+        }),
+      tryGrantFinalHeart: () =>
+        setState((s) => {
+          const allMainStoriesComplete =
+            s.photoStoryComplete && s.vaseStoryComplete && s.telescopeStoryComplete;
+          const enoughSideItemsViewed = s.viewedSideItems.length >= 3;
+          if (!allMainStoriesComplete || !enoughSideItemsViewed) return s;
+          if (s.hearts >= 10 && s.finalRewardReady) return s;
+          return {
+            ...s,
+            hearts: Math.max(s.hearts, 10),
+            finalRewardReady: true,
+          };
+        }),
+      startFinalSequence,
+      setFinalSequencePhase,
+      completeFinalSequence,
+      resetGame,
       isDevStoryEntry,
       enterDevStory: (next) => {
         if (!import.meta.env.DEV) return;
@@ -113,7 +210,17 @@ export function GameProvider({ children }: { children: ReactNode }) {
       },
       clearDevStoryEntry: () => setIsDevStoryEntry(false),
     }),
-    [state, scene, isFading, goToScene, isDevStoryEntry],
+    [
+      state,
+      scene,
+      isFading,
+      goToScene,
+      isDevStoryEntry,
+      startFinalSequence,
+      setFinalSequencePhase,
+      completeFinalSequence,
+      resetGame,
+    ],
   );
 
   return <GameContext.Provider value={value}>{children}</GameContext.Provider>;

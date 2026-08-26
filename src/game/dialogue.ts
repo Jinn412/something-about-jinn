@@ -40,3 +40,31 @@ export function merchantVaseComplete(): DialogueLine[] {
     { speaker: MERCHANT, text: "好了。那架望远镜，好像也愿意让你看看了。" },
   ];
 }
+
+/** After Telescope Story is completed and the player returns to the hub. */
+export function merchantTelescopeComplete(): DialogueLine[] {
+  return [
+    { speaker: MERCHANT, text: "原来如此……她看到的，不只是远处。" },
+    { speaker: MERCHANT, text: "三件东西都看完了。别急着走，再四处看看吧。" },
+  ];
+}
+
+/** 10th heart settled; gift the starfruit. */
+export function merchantFinalGift(): DialogueLine[] {
+  return [
+    { speaker: MERCHANT, text: "谢谢你的耐心，拼凑出了一个完整的她。" },
+    { speaker: MERCHANT, text: "这个，就送给你吧。" },
+  ];
+}
+
+/** After the player clicks the starfruit. Empty speaker = no nameplate. */
+export function starfruitTasteLines(favoriteThing: string): DialogueLine[] {
+  const trimmed = favoriteThing.trim();
+  const taste = trimmed
+    ? `它的味道，让你想起了「${trimmed}」。`
+    : "它的味道，让你想起了那些你喜欢的事物。";
+  return [
+    { speaker: "", text: "你吃下了星之果实。" },
+    { speaker: "", text: taste },
+  ];
+}

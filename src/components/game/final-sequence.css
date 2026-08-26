@@ -1,0 +1,305 @@
+@keyframes final-starfruit-reveal {
+  from {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes final-starfruit-idle {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+@keyframes final-starfruit-eat {
+  to {
+    opacity: 0;
+    transform: translateY(-12px) scale(1.06);
+  }
+}
+
+@keyframes final-dim-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 0.32;
+  }
+}
+
+@keyframes final-dim-out {
+  from {
+    opacity: 0.32;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes final-balloons-rise {
+  0% {
+    opacity: 0;
+    transform: translate(-6px, 28%);
+  }
+  8% {
+    opacity: 0.8;
+    transform: translate(-3px, 19%);
+  }
+  32% {
+    opacity: 0.8;
+    transform: translate(8px, -8%);
+  }
+  56% {
+    opacity: 0.8;
+    transform: translate(-8px, -36%);
+  }
+  80% {
+    opacity: 0.8;
+    transform: translate(5px, -64%);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-3px, -82%);
+  }
+}
+
+@keyframes final-merchant-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  45% {
+    transform: translateY(-7px);
+  }
+}
+
+@keyframes heart-bar-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.08);
+  }
+}
+
+.final-dim {
+  background: #000;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.final-dim.is-on {
+  animation: final-dim-in 600ms ease-out forwards;
+}
+
+.final-dim.is-off {
+  animation: final-dim-out 800ms ease-in-out forwards;
+}
+
+.final-starfruit-wrap {
+  height: 32%;
+  transform-origin: center center;
+}
+
+.final-starfruit-wrap.is-revealing {
+  animation: final-starfruit-reveal 1750ms cubic-bezier(0.16, 0.84, 0.44, 1) both;
+}
+
+.final-starfruit-wrap.is-idle {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.final-starfruit-wrap.is-idle .final-starfruit-float {
+  animation: final-starfruit-idle 2100ms ease-in-out infinite;
+}
+
+.final-starfruit-wrap.is-eating {
+  animation: final-starfruit-eat 520ms ease-in forwards;
+}
+
+.final-starfruit-btn {
+  display: block;
+  height: 100%;
+  cursor: pointer;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  transition:
+    transform 180ms ease-out,
+    filter 180ms ease-out;
+}
+
+.final-starfruit-btn:disabled {
+  cursor: default;
+}
+
+.final-starfruit-btn:not(:disabled):hover {
+  transform: scale(1.03);
+  filter: brightness(1.08);
+}
+
+.final-balloons {
+  pointer-events: none;
+  animation: final-balloons-rise 10s linear forwards;
+}
+
+/* Same hub-scene.png as the base layer; clip-path is scene-stage %. */
+.hub-cart-occlusion,
+.hub-cart-occlusion img {
+  pointer-events: none;
+}
+
+.hub-cart-occlusion-cart {
+  clip-path: polygon(
+    30.2% 28%,
+    50.6% 27.4%,
+    71.4% 28.2%,
+    73.2% 42.8%,
+    73.8% 64%,
+    72.6% 81.6%,
+    28.6% 81.6%,
+    25.6% 63%,
+    24.4% 48.5%,
+    26.8% 42.4%,
+    29.8% 42.6%
+  );
+}
+
+.hub-cart-occlusion-pig {
+  clip-path: polygon(
+    73.2% 63.5%,
+    79.8% 61.2%,
+    87.6% 63.2%,
+    90.4% 69.8%,
+    89.2% 80.6%,
+    81.2% 82.4%,
+    74.2% 79.8%,
+    72.6% 70.5%
+  );
+}
+
+.final-merchant-bob {
+  animation: final-merchant-bob 700ms ease-in-out 1;
+}
+
+.heart-bar-pulse {
+  animation: heart-bar-pulse 800ms ease-in-out 1;
+  transform-origin: left top;
+}
+
+@keyframes final-end-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes final-end-title-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.final-end-fade {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  background: #000;
+  pointer-events: auto;
+  opacity: 0;
+}
+
+.final-end-fade.is-fading {
+  animation: final-end-fade 1750ms ease-in-out forwards;
+}
+
+.final-end-fade.is-black {
+  opacity: 1;
+}
+
+.final-end-title-wrap {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.final-end-title-wrap.is-leaving {
+  animation: final-end-leave 600ms ease-in forwards;
+}
+
+@keyframes final-end-leave {
+  to {
+    opacity: 0;
+  }
+}
+
+.final-end-title {
+  margin: 0;
+  width: 28%;
+  font-family: var(--font-pixel);
+  font-size: clamp(12px, 2.2vw, 26px);
+  font-weight: 400;
+  line-height: 2.15;
+  letter-spacing: 0.06em;
+  color: var(--parchment);
+  text-align: center;
+  opacity: 0;
+}
+
+.final-end-title.is-in {
+  animation: final-end-title-in 1200ms ease-out forwards;
+}
+
+@keyframes final-end-restart-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.final-end-restart {
+  position: absolute;
+  top: calc(50% + 6.75rem);
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 0.55rem 0.9rem;
+  font-family: var(--font-pixel-cn);
+  font-size: 12px;
+  line-height: 1;
+  letter-spacing: 0.12em;
+  color: color-mix(in oklch, var(--parchment) 72%, transparent);
+  background: transparent;
+  border: 2px solid color-mix(in oklch, var(--parchment) 32%, transparent);
+  cursor: pointer;
+  pointer-events: auto;
+  opacity: 0;
+  animation: final-end-restart-in 600ms ease-out forwards;
+}
+
+.final-end-restart:hover {
+  filter: brightness(1.18);
+  transform: translateX(calc(-50% + 2px));
+}

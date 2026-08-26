@@ -1,5 +1,19 @@
 export type SceneId = "title" | "setup" | "hub" | "story-photo" | "story-vase" | "story-telescope";
 
+export type FinalSequencePhase =
+  | "none"
+  | "merchant"
+  | "starfruit"
+  | "starfruit-ready"
+  | "eating"
+  | "taste"
+  | "celebration"
+  | "celebration-complete"
+  | "hold"
+  | "fade"
+  | "end-title"
+  | "complete";
+
 export type ItemKind = "main" | "locked" | "egg";
 
 export interface InteractiveItem {
@@ -40,8 +54,21 @@ export interface GameState {
   photoStoryComplete: boolean;
   /** Vase Story fully completed */
   vaseStoryComplete: boolean;
+  /** Telescope Story fully completed */
+  telescopeStoryComplete: boolean;
   /** One-shot merchant dialogue after returning from Photo Story */
   pendingPhotoMerchantDialogue: boolean;
   /** One-shot merchant dialogue after returning from Vase Story */
   pendingVaseMerchantDialogue: boolean;
+  /** One-shot merchant dialogue after returning from Telescope Story */
+  pendingTelescopeMerchantDialogue: boolean;
+  /** Unique Hub side-item ids the player has opened (not photo/vase/telescope). */
+  viewedSideItems: string[];
+  /** 10th heart granted; next round uses this for the final merchant sequence. */
+  finalRewardReady: boolean;
+  /** Ending has begun; never restart the final sequence. */
+  finalSequenceStarted: boolean;
+  /** Ending finished on the black title card. */
+  finalSequenceComplete: boolean;
+  finalSequencePhase: FinalSequencePhase;
 }

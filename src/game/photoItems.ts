@@ -5,6 +5,7 @@ export function resolveHubItem(
   item: InteractiveItem,
   photoStoryComplete: boolean,
   vaseStoryComplete = false,
+  telescopeStoryComplete = false,
 ): InteractiveItem {
   if (item.id === "photo" && photoStoryComplete) {
     return {
@@ -39,6 +40,14 @@ export function resolveHubItem(
         "也许值得一探究竟。",
       ],
       goToScene: "story-vase",
+    };
+  }
+
+  if (item.id === "telescope" && telescopeStoryComplete) {
+    return {
+      ...item,
+      kind: "main",
+      lines: ["镜筒里好像有了新的方向。", "（双击望远镜，可查看秘密纸条）"],
     };
   }
 

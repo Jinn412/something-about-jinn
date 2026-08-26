@@ -58,10 +58,22 @@ type Phase =
   | "build-overlay"
   | "build-line"
   | "restore-build"
-  | "complete";
+  | "complete"
+  | "leave-focus";
+
+const LEAVE_MS = 550;
+const LEAVE_HOLD_MS = 620;
 
 /** Telescope Story T4: LATE NIGHT / BUILDING. ASK → TRY → BUILD, then free browse. */
-export function TelescopeLateNight({ onContinue }: { onContinue?: () => void }) {
+export function TelescopeLateNight({
+  exiting = false,
+  onContinue,
+  onExited,
+}: {
+  exiting?: boolean;
+  onContinue?: () => void;
+  onExited?: () => void;
+}) {
   const [phase, setPhase] = useState<Phase>("search-ask");
   const [status, setStatus] = useState("SEARCHING...");
   const [viewScale, setViewScale] = useState(EXPLORATION_SCALE);
@@ -78,6 +90,10 @@ export function TelescopeLateNight({ onContinue }: { onContinue?: () => void }) 
   const completed = useRef(new Set<string>());
   const phaseRef = useRef(phase);
   phaseRef.current = phase;
+  const onContinueRef = useRef(onContinue);
+  onContinueRef.current = onContinue;
+  const onExitedRef = useRef(onExited);
+  onExitedRef.current = onExited;
 
   useEffect(() => {
     return () => {
@@ -86,15 +102,21 @@ export function TelescopeLateNight({ onContinue }: { onContinue?: () => void }) 
     };
   }, []);
 
+  useEffect(() => {
+    if (!exiting) return;
+    const id = window.setTimeout(() => onExitedRef.current?.(), LEAVE_MS);
+    return () => window.clearTimeout(id);
+  }, [exiting]);
+
   const later = useCallback((ms: number, fn: () => void) => {
     const id = window.setTimeout(fn, ms);
     timers.current.push(id);
   }, []);
 
   const searching = phase === "search-ask" || phase === "search-try" || phase === "search-build";
-  const focusing = phase === "lock-ask" || phase === "lock-try" || phase === "lock-build";
+  const focusing = phase === "lock-ask" || phase === "lock-try" || phase === "lock-build" || phase === "leave-focus";
   const restoring = phase === "restore-ask" || phase === "restore-try" || phase === "restore-build";
-  const panEnabled = searching || phase === "complete";
+  const panEnabled = (searching || phase === "complete") && !exiting && phase !== "leave-focus";
   const acquireEnabled = searching;
 
   useEffect(() => {
@@ -246,6 +268,16 @@ export function TelescopeLateNight({ onContinue }: { onContinue?: () => void }) 
     });
   };
 
+  const startLeave = () => {
+    if (phaseRef.current !== "complete") return;
+    setPhase("leave-focus");
+    setShowRunning(true);
+    setOverlayFading(false);
+    setFocusTarget(BUILD);
+    setViewScale(TARGET_FOCUS_SCALE);
+    later(FOCUS_MS + LEAVE_HOLD_MS, () => onContinueRef.current?.());
+  };
+
   const searchTarget =
     phase === "search-ask" ? ASK : phase === "search-try" ? TRY : phase === "search-build" ? BUILD : null;
   const motionMs = restoring ? RESTORE_MS : FOCUS_MS;
@@ -255,13 +287,16 @@ export function TelescopeLateNight({ onContinue }: { onContinue?: () => void }) 
   const showTryOverlay =
     phase === "try-seq" || phase === "try-line" || (overlayFading && phase === "restore-try");
   const showBuildOverlay =
-    phase === "build-overlay" || phase === "build-line" || (overlayFading && phase === "restore-build");
+    phase === "build-overlay" ||
+    phase === "build-line" ||
+    phase === "leave-focus" ||
+    (overlayFading && phase === "restore-build");
 
   const tryLabel = tryStep >= 0 ? TRY_STEPS[tryStep] : "";
   const tryIsError = tryLabel === "ERROR";
 
   return (
-    <div className="telescope-late-night">
+    <div className={`telescope-late-night ${exiting ? "is-leaving" : ""}`}>
       <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
         <div className="telescope-stage relative aspect-[1536/1024] h-auto min-h-full w-auto min-w-full">
           <img
@@ -341,9 +376,9 @@ export function TelescopeLateNight({ onContinue }: { onContinue?: () => void }) 
           </div>
 
           <p className={`telescope-status ${status !== "SEARCHING..." ? "is-held" : ""}`}>{status}</p>
-          {phase === "complete" && onContinue && (
+          {phase === "complete" && onContinue && !exiting && (
             <div className="telescope-next-continue">
-              <button type="button" className="pixel-btn telescope-continue" onClick={onContinue}>
+              <button type="button" className="pixel-btn telescope-continue" onClick={startLeave}>
                 继续观测
               </button>
             </div>

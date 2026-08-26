@@ -12,10 +12,11 @@ export function isOfficialStoryEntry(
   itemId: string,
   photoStoryComplete: boolean,
   vaseStoryComplete = false,
+  telescopeStoryComplete = false,
 ) {
   if (itemId === "photo") return !photoStoryComplete;
   if (itemId === "vase") return photoStoryComplete && !vaseStoryComplete;
-  if (itemId === "telescope") return vaseStoryComplete;
+  if (itemId === "telescope") return vaseStoryComplete && !telescopeStoryComplete;
   return false;
 }
 

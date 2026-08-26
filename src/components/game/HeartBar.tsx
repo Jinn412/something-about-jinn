@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
+import "./final-sequence.css";
 
 interface HeartBarProps {
   hearts: number;
   maxHearts: number;
+  pulse?: boolean;
 }
 
 /** Retro affection HUD — fills new hearts one at a time when count increases. */
-export function HeartBar({ hearts, maxHearts }: HeartBarProps) {
+export function HeartBar({ hearts, maxHearts, pulse = false }: HeartBarProps) {
   const [displayed, setDisplayed] = useState(hearts);
 
   useEffect(() => {
@@ -22,7 +24,11 @@ export function HeartBar({ hearts, maxHearts }: HeartBarProps) {
   }, [hearts, displayed]);
 
   return (
-    <div className="pointer-events-none fixed left-4 top-4 z-30 flex gap-1 md:gap-2">
+    <div
+      className={`pointer-events-none fixed left-4 top-4 z-30 flex gap-1 md:gap-2 ${
+        pulse ? "heart-bar-pulse" : ""
+      }`}
+    >
       {Array.from({ length: maxHearts }).map((_, i) => (
         <span
           key={i}

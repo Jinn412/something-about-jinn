@@ -57,9 +57,11 @@ export function DialogueBox({ lines, onFinish, instant = false }: DialogueBoxPro
       )}
 
       <div className="relative mx-auto max-w-3xl">
-        <div className="pixel-frame absolute -top-7 left-6 px-4 py-1 text-xs text-parchment md:text-sm">
-          {line.speaker}
-        </div>
+        {line.speaker ? (
+          <div className="pixel-frame absolute -top-7 left-6 px-4 py-1 text-xs text-parchment md:text-sm">
+            {line.speaker}
+          </div>
+        ) : null}
         <button
           type="button"
           onClick={advance}

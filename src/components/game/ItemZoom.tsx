@@ -2,6 +2,7 @@ import { useState } from "react";
 import hubScene from "@/assets/hub-scene.png";
 import { PhotoSecretNote } from "./story-photo/PhotoSecretNote";
 import { VaseSecretNote } from "./story-vase/VaseSecretNote";
+import { TelescopeSecretNote } from "./story-telescope/TelescopeSecretNote";
 import type { InteractiveItem } from "@/game/types";
 
 const SCENE_W = 1536;
@@ -14,8 +15,10 @@ interface ItemZoomProps {
   onEnterStory?: (item: InteractiveItem) => void;
   onReplayPhotoStory?: () => void;
   onReplayVaseStory?: () => void;
+  onReplayTelescopeStory?: () => void;
   photoStoryComplete?: boolean;
   vaseStoryComplete?: boolean;
+  telescopeStoryComplete?: boolean;
   showDevMark?: boolean;
 }
 
@@ -26,8 +29,10 @@ export function ItemZoom({
   onEnterStory,
   onReplayPhotoStory,
   onReplayVaseStory,
+  onReplayTelescopeStory,
   photoStoryComplete,
   vaseStoryComplete,
+  telescopeStoryComplete,
   showDevMark,
 }: ItemZoomProps) {
   const [secretNoteOpen, setSecretNoteOpen] = useState(false);
@@ -37,7 +42,9 @@ export function ItemZoom({
   const boxH = (crop.height / 100) * bgH;
   const canEnterStory = Boolean(item.goToScene && onEnterStory);
   const canSecretNote =
-    (item.id === "photo" && photoStoryComplete) || (item.id === "vase" && vaseStoryComplete);
+    (item.id === "photo" && photoStoryComplete) ||
+    (item.id === "vase" && vaseStoryComplete) ||
+    (item.id === "telescope" && telescopeStoryComplete);
   const openSecretNote = () => {
     if (canSecretNote) setSecretNoteOpen(true);
   };
@@ -119,6 +126,15 @@ export function ItemZoom({
           onReplay={() => {
             setSecretNoteOpen(false);
             onReplayVaseStory?.();
+          }}
+        />
+      )}
+      {secretNoteOpen && item.id === "telescope" && (
+        <TelescopeSecretNote
+          onClose={() => setSecretNoteOpen(false)}
+          onReplay={() => {
+            setSecretNoteOpen(false);
+            onReplayTelescopeStory?.();
           }}
         />
       )}
