@@ -1,0 +1,128 @@
+/* Photo: Hub old-photo ItemZoom + ProfilePanel only. Desktop rules stay in markup. */
+@media (orientation: landscape) and (pointer: coarse) and (max-height: 520px) {
+  .photo-old-photo-detail {
+    box-sizing: border-box;
+    padding-top: max(12px, env(safe-area-inset-top, 0px));
+    padding-right: max(12px, env(safe-area-inset-right, 0px));
+    padding-bottom: max(24px, env(safe-area-inset-bottom, 0px) + 20px);
+    padding-left: max(12px, env(safe-area-inset-left, 0px));
+  }
+
+  .photo-old-photo-detail .photo-old-photo-panel {
+    width: min(64vw, 36rem);
+    max-width: 100%;
+    max-height: min(
+      84dvh,
+      calc(100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - 48px)
+    );
+  }
+
+  .photo-old-photo-detail .photo-old-photo-frame {
+    display: flex;
+    min-height: 0;
+    max-height: min(
+      84dvh,
+      calc(100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - 48px)
+    );
+    flex-direction: column;
+    box-sizing: border-box;
+    padding: 12px;
+  }
+
+  .photo-old-photo-detail .photo-old-photo-visual {
+    display: flex;
+    min-height: 0;
+    flex: 1 1 auto;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 8px;
+  }
+
+  .photo-old-photo-detail .photo-old-photo-art {
+    max-height: min(38dvh, 100%) !important;
+    width: auto;
+    max-width: 100%;
+    object-fit: contain;
+  }
+
+  .photo-old-photo-detail .photo-old-photo-copy {
+    flex-shrink: 0;
+    margin-top: 8px;
+    padding: 12px 16px;
+    font-size: 14.5px;
+    line-height: 1.6;
+  }
+
+  .photo-old-photo-detail .photo-old-photo-copy .photo-old-photo-title {
+    margin-bottom: 0.25rem;
+    font-size: 12.5px;
+  }
+
+  .photo-old-photo-detail .photo-old-photo-actions {
+    flex-shrink: 0;
+    margin-top: 8px;
+  }
+
+  .photo-old-photo-detail .photo-old-photo-actions .pixel-btn {
+    min-height: 40px;
+    padding: 0.5rem 1rem;
+  }
+
+  .photo-profile-panel {
+    box-sizing: border-box;
+    padding-top: max(12px, env(safe-area-inset-top, 0px));
+    padding-right: max(12px, env(safe-area-inset-right, 0px));
+    padding-bottom: max(24px, env(safe-area-inset-bottom, 0px) + 20px);
+    padding-left: max(12px, env(safe-area-inset-left, 0px));
+  }
+
+  .photo-profile-panel .photo-profile-frame {
+    display: flex;
+    width: min(52vw, 28rem);
+    max-height: min(
+      84dvh,
+      calc(100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - 48px)
+    );
+    flex-direction: column;
+    box-sizing: border-box;
+    padding: 12px;
+  }
+
+  .photo-profile-panel .photo-profile-body {
+    min-height: 0;
+    flex: 1 1 auto;
+    overflow: visible;
+    padding: 15px 16px;
+    font-size: 12.5px;
+    line-height: 1.55;
+  }
+
+  .photo-profile-panel .photo-profile-title {
+    margin-bottom: 0.7rem;
+  }
+
+  .photo-profile-panel .photo-profile-section {
+    margin-top: 0.7rem;
+  }
+
+  .photo-profile-panel .photo-profile-stats {
+    margin-top: 0.3rem;
+    font-size: 12.5px;
+    line-height: 1.6;
+  }
+
+  .photo-profile-panel .photo-profile-type {
+    margin-top: 0.7rem;
+    padding-top: 0.7rem;
+  }
+
+  .photo-profile-panel .photo-profile-footer {
+    flex-shrink: 0;
+    margin-top: 8px;
+  }
+
+  .photo-profile-panel .photo-profile-footer .pixel-btn {
+    min-height: 44px;
+    padding: 0.55rem 1rem;
+  }
+}

@@ -1,0 +1,86 @@
+/* Vase Story Mobile Landscape only. Do not add desktop rules here. */
+@media (orientation: landscape) and (pointer: coarse) and (max-height: 520px) {
+  /* Timer lives in a viewport overlay so 50dvw/50dvh is the visible game area. */
+  .vs-s3-clock-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 22;
+    pointer-events: none;
+  }
+
+  .vs-s3-clock-overlay .vs-s3-clock {
+    top: max(8px, 10.5%, env(safe-area-inset-top, 0px));
+    right: max(12px, 4.2%, env(safe-area-inset-right, 0px));
+    transform: translate(0, 0);
+    transform-origin: center center;
+  }
+
+  .vs-s3-clock-overlay .vs-s3-clock.is-focus {
+    transform: translate(
+      calc(max(12px, 4.2vw, env(safe-area-inset-right, 0px)) + 50% - 50dvw),
+      calc(50dvh - max(8px, 10.5dvh, env(safe-area-inset-top, 0px)) - 50%)
+    );
+  }
+
+  .vs-ability-root {
+    box-sizing: border-box;
+    padding-top: max(8px, env(safe-area-inset-top, 0px));
+    padding-right: max(12px, env(safe-area-inset-right, 0px));
+    padding-bottom: max(8px, env(safe-area-inset-bottom, 0px));
+    padding-left: max(12px, env(safe-area-inset-left, 0px));
+  }
+
+  .vs-ability-frame {
+    display: flex;
+    max-height: 92dvh;
+    flex-direction: column;
+    box-sizing: border-box;
+    width: min(78vw, 560px);
+    padding: 10px;
+  }
+
+  .vs-ability-body {
+    display: flex;
+    min-height: 0;
+    flex: 1 1 auto;
+    flex-direction: column;
+    overflow: hidden;
+    padding: 12px 18px;
+    font-size: 13px;
+    line-height: 1.55;
+  }
+
+  .vs-ability-header {
+    flex-shrink: 0;
+    margin-bottom: 8px;
+  }
+
+  .vs-ability-content {
+    min-height: 0;
+    flex: 1 1 auto;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+  }
+
+  .vs-ability-content .vs-ability-row {
+    margin-top: 10px;
+  }
+
+  .vs-ability-content .vs-ability-row:first-child {
+    margin-top: 0;
+  }
+
+  .vs-ability-footer {
+    display: flex;
+    flex-shrink: 0;
+    justify-content: flex-end;
+    margin-top: 8px;
+  }
+
+  .vs-ability-footer .pixel-btn {
+    min-height: 44px;
+    padding-top: 0.65rem;
+    padding-bottom: 0.65rem;
+  }
+}

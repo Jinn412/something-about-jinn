@@ -3,6 +3,7 @@ import seminarArt from "@/assets/t3-seminar.png";
 import { DialogueBox } from "../DialogueBox";
 import { TelescopePanViewport, type PanTarget } from "./TelescopePanViewport";
 import "./telescope-story.css";
+import "./telescope-t3-mobile.css";
 
 const TICKS = [0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330] as const;
 const CARDINAL = new Set([0, 90, 180, 270]);
@@ -115,15 +116,12 @@ export function TelescopePerspectives({
     };
   }, [searching, phase]);
 
-  const beginFocus = useCallback(
-    (target: PanTarget) => {
-      setFocusTarget(target);
-      setViewScale(TARGET_FOCUS_SCALE);
-      setReticleHot(true);
-      setStatus("TARGET ACQUIRED");
-    },
-    [],
-  );
+  const beginFocus = useCallback((target: PanTarget) => {
+    setFocusTarget(target);
+    setViewScale(TARGET_FOCUS_SCALE);
+    setReticleHot(true);
+    setStatus("TARGET ACQUIRED");
+  }, []);
 
   const restoreExploration = useCallback(() => {
     setFocusTarget(null);
@@ -185,11 +183,11 @@ export function TelescopePerspectives({
   };
 
   const afterClose = () => {
-    setStatus("SEARCHING...");
     setPhase("complete");
   };
 
-  const searchTarget = phase === "search-students" ? STUDENTS : phase === "search-professor" ? PROFESSOR : null;
+  const searchTarget =
+    phase === "search-students" ? STUDENTS : phase === "search-professor" ? PROFESSOR : null;
   const motionMs = restoring ? RESTORE_MS : FOCUS_MS;
 
   const showNote = phase === "note";
@@ -228,7 +226,9 @@ export function TelescopePerspectives({
             <div className="telescope-viewport" />
           </div>
 
-          <div className={`telescope-lens-overlay ${reticleHot ? "is-hot" : ""} ${near ? "is-near" : ""}`}>
+          <div
+            className={`telescope-lens-overlay ${reticleHot ? "is-hot" : ""} ${near ? "is-near" : ""}`}
+          >
             <TelescopePanViewport
               src={seminarArt}
               viewScale={viewScale}
@@ -246,7 +246,11 @@ export function TelescopePerspectives({
             <div className="telescope-lens-vignette" />
           </div>
 
-          <p className={`telescope-status ${status !== "SEARCHING..." ? "is-held" : ""}`}>{status}</p>
+          {phase !== "complete" && (
+            <p className={`telescope-status ${status !== "SEARCHING..." ? "is-held" : ""}`}>
+              {status}
+            </p>
+          )}
           {showNote && <p className="telescope-t3-note">A NOTE SHE KEPT</p>}
           {phase === "complete" && onContinue && !exiting && (
             <div className="telescope-next-continue">

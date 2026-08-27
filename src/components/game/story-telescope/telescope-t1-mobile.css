@@ -1,0 +1,112 @@
+/* Telescope T1 (TelescopeSearch) only. Desktop rules stay in telescope-story.css. */
+.telescope-story-root .telescope-search .telescope-sky-t1-clear {
+  display: none;
+}
+
+@media (orientation: landscape) and (pointer: coarse) and (max-height: 520px) {
+  .telescope-story-root .telescope-search {
+    --t1-safe-bottom: calc(env(safe-area-inset-bottom, 0px) + 44px);
+  }
+
+  .telescope-story-root .telescope-search .telescope-stage {
+    --ts-cy: calc(50% - 16dvh);
+  }
+
+  .telescope-story-root .telescope-search .telescope-scope-shell {
+    height: min(62dvh, 58vw);
+  }
+
+  .telescope-story-root .telescope-search .telescope-lens-overlay {
+    height: min(47.12dvh, 44.08vw);
+    overflow: hidden;
+    border-radius: 50%;
+  }
+
+  .telescope-story-root .telescope-search .telescope-viewport {
+    overflow: hidden;
+  }
+
+  /*
+    WebKit composites filter+clip-path onto a light offscreen buffer.
+    Desktop keeps the inline brightness/contrast ramp. Mobile freezes
+    brightness so the lens stays the same dark starfield at 0–100.
+  */
+  .telescope-story-root .telescope-search .telescope-sky-focused {
+    background-color: oklch(0.07 0.02 250);
+  }
+
+  .telescope-story-root .telescope-search .telescope-sky-focused:not(.telescope-sky-t1-clear) {
+    filter: blur(10px) brightness(0.72) contrast(0.9) saturate(0.88) !important;
+    opacity: calc(1 - var(--ts-focus-t, 0));
+  }
+
+  .telescope-story-root .telescope-search .telescope-sky-t1-clear {
+    display: block;
+    filter: brightness(0.72) contrast(0.92) saturate(0.88);
+    opacity: var(--ts-focus-t, 0);
+  }
+
+  .telescope-story-root .telescope-search .telescope-signal-group {
+    transform-origin: 50% 50%;
+    transform: translateX(3.4%) scale(0.62);
+  }
+
+  .telescope-story-root .telescope-search .telescope-signal.is-high {
+    font-size: 18px;
+  }
+
+  .telescope-story-root .telescope-search .telescope-signal.is-mid {
+    font-size: 11px;
+  }
+
+  .telescope-story-root .telescope-search .telescope-status {
+    top: auto;
+    bottom: calc((100% - 100dvh) / 2 + var(--t1-safe-bottom) + 86px);
+  }
+
+  .telescope-story-root .telescope-search .telescope-focus-control {
+    top: auto;
+    display: grid;
+    width: min(48vw, 22rem);
+    grid-template-columns: 1fr auto;
+    grid-template-rows: auto auto;
+    bottom: calc((100% - 100dvh) / 2 + var(--t1-safe-bottom));
+    align-items: center;
+    column-gap: 10px;
+    row-gap: 4px;
+  }
+
+  .telescope-story-root .telescope-search .telescope-focus-control label {
+    grid-column: 1;
+    grid-row: 1;
+    justify-self: start;
+  }
+
+  .telescope-story-root .telescope-search .telescope-focus-slider {
+    display: flex;
+    grid-column: 1 / -1;
+    grid-row: 2;
+    width: 100%;
+    min-height: 48px;
+    align-items: center;
+    touch-action: none;
+  }
+
+  .telescope-story-root .telescope-search .telescope-focus-slider input[type="range"] {
+    touch-action: none;
+  }
+
+  .telescope-story-root .telescope-search .telescope-continue {
+    grid-column: 2;
+    grid-row: 1;
+    min-height: 28px;
+    margin-top: 0;
+    padding: 4px 10px;
+    font-size: 9px;
+  }
+
+  .telescope-story-root .telescope-search.is-leaving .telescope-sky-focused:not(.telescope-sky-t1-clear),
+  .telescope-story-root .telescope-search.is-leaving .telescope-sky-t1-clear {
+    opacity: 0;
+  }
+}

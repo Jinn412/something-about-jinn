@@ -40,7 +40,7 @@ export function StoryTelescopeScene() {
 
   return (
     <div
-      className={`relative h-full w-full overflow-hidden ${phase === "ending" ? "is-telescope-ending" : ""} ${blackout ? "is-ending-blackout" : ""}`}
+      className={`telescope-story-root relative h-full w-full overflow-hidden ${phase === "ending" ? "is-telescope-ending" : ""} ${blackout ? "is-ending-blackout" : ""}`}
       data-visual-ending-complete={visualEndingComplete ? "true" : "false"}
     >
       {(phase === "leaving-t4" || phase === "future" || (phase === "ending" && !scopeGone)) && (

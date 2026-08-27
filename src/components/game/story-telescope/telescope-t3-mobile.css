@@ -1,0 +1,18 @@
+/* Telescope T3 (TelescopePerspectives) only. Desktop rules stay in telescope-story.css. */
+@media (orientation: landscape) and (pointer: coarse) and (max-height: 520px) {
+  .telescope-story-root .telescope-perspectives .telescope-next-continue {
+    top: auto;
+    left: auto;
+    z-index: 8;
+    right: max(24px, env(safe-area-inset-right, 0px) + 16px);
+    bottom: calc(
+      (100% - 100dvh) / 2 + max(32px, env(safe-area-inset-bottom, 0px) + 24px)
+    );
+    transform: none;
+  }
+
+  .telescope-story-root .telescope-perspectives .telescope-next-continue .telescope-continue {
+    min-height: 44px;
+    padding: 8px 14px;
+  }
+}

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type CSSProperties } from "react";
 import starfieldArt from "@/assets/星空底图.png";
 import { DialogueBox } from "../DialogueBox";
 import "./telescope-story.css";
+import "./telescope-t1-mobile.css";
 
 const HOLD_MS = 600;
 const SLIDER_AFTER_MS = 300;
@@ -185,7 +186,10 @@ export function TelescopeSearch({
   const constellation = constellationLook(focusValue);
 
   return (
-    <div className={`telescope-search relative h-full w-full overflow-hidden ${exiting ? "is-leaving" : ""}`}>
+    <div
+      className={`telescope-search relative h-full w-full overflow-hidden ${exiting ? "is-leaving" : ""}`}
+      style={{ "--ts-focus-t": String(clamp01(focusValue / 100)) } as CSSProperties}
+    >
       <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
         <div
           ref={stageRef}
@@ -205,6 +209,14 @@ export function TelescopeSearch({
             height={1024}
             className="telescope-sky telescope-sky-focused"
             style={{ filter: lensFilter }}
+          />
+          <img
+            src={starfieldArt}
+            alt=""
+            width={1536}
+            height={1024}
+            className="telescope-sky telescope-sky-focused telescope-sky-t1-clear"
+            aria-hidden
           />
           <div className="telescope-sky-vignette" />
 
@@ -288,15 +300,17 @@ export function TelescopeSearch({
           {showSlider && (
             <div className="telescope-focus-control">
               <label htmlFor="telescope-focus">FOCUS</label>
-              <input
-                id="telescope-focus"
-                type="range"
-                min={0}
-                max={100}
-                value={focusValue}
-                onChange={(e) => onFocusChange(e.target.value)}
-                disabled={exiting}
-              />
+              <div className="telescope-focus-slider">
+                <input
+                  id="telescope-focus"
+                  type="range"
+                  min={0}
+                  max={100}
+                  value={focusValue}
+                  onChange={(e) => onFocusChange(e.target.value)}
+                  disabled={exiting}
+                />
+              </div>
               {acquired && (
                 <button
                   type="button"

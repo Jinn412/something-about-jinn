@@ -49,13 +49,14 @@ export function FinalSequence({ preview = false, onPhaseChange, onExitPreview }:
 
   const [previewPhase, setPreviewPhase] = useState<FinalSequencePhase>("merchant");
 
-  const phase = preview ? previewPhase : livePhase;
-  const favoriteForLines = preview
+  const previewOnly = import.meta.env.DEV && preview;
+  const phase = previewOnly ? previewPhase : livePhase;
+  const favoriteForLines = previewOnly
     ? favoriteThing.trim() || PREVIEW_FAVORITE_FALLBACK
     : favoriteThing;
 
   const setPhase = (next: FinalSequencePhase) => {
-    if (preview) {
+    if (previewOnly) {
       setPreviewPhase(next);
       onPhaseChange?.(next);
       return;
@@ -115,14 +116,14 @@ export function FinalSequence({ preview = false, onPhaseChange, onExitPreview }:
   useEffect(() => {
     if (phase !== "end-title") return;
     const id = window.setTimeout(() => {
-      if (preview) {
+      if (previewOnly) {
         setPhaseRef.current("complete");
         return;
       }
       completeFinalSequence();
     }, ENDING_TITLE_MS);
     return () => window.clearTimeout(id);
-  }, [phase, preview, completeFinalSequence]);
+  }, [phase, previewOnly, completeFinalSequence]);
 
   useEffect(() => {
     if (phase !== "complete") {
@@ -138,7 +139,7 @@ export function FinalSequence({ preview = false, onPhaseChange, onExitPreview }:
     leavingLock.current = true;
     setLeaving(true);
     window.setTimeout(() => {
-      if (preview) {
+      if (previewOnly) {
         exitFinalPreviewUrl();
         onExitPreview?.();
         return;

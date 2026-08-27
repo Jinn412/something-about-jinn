@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import "./vase-mobile-landscape.css";
 
 const SKILLS = [
   {
@@ -69,23 +70,25 @@ export function VaseAbilityPanel({ onDismiss }: VaseAbilityPanelProps) {
 
   return (
     <div
-      className={`absolute inset-0 z-[60] flex items-center justify-center bg-black/40 px-4 ${
+      className={`vs-ability-root absolute inset-0 z-[60] flex items-center justify-center bg-black/40 px-4 ${
         leaving ? "vs-ability-out" : ""
       }`}
     >
-      <div className="pixel-frame w-full max-w-[560px] p-4">
-        <div className="pixel-panel px-5 py-5 text-sm leading-8">
-          <p className="mb-4 text-plum">能力档案已更新</p>
-          {SKILLS.slice(0, shown).map((skill, i) => (
-            <p key={skill.name} className={`vs-ability-row ${i === 0 ? "" : "mt-4"}`}>
-              <span className="text-plum">{skill.name}</span>
-              <br />
-              {skill.detail}
-            </p>
-          ))}
+      <div className="vs-ability-frame pixel-frame w-full max-w-[560px] p-4">
+        <div className="vs-ability-body pixel-panel px-5 py-5 text-sm leading-8">
+          <p className="vs-ability-header mb-4 text-plum">能力档案已更新</p>
+          <div className="vs-ability-content">
+            {SKILLS.slice(0, shown).map((skill, i) => (
+              <p key={skill.name} className={`vs-ability-row ${i === 0 ? "" : "mt-4"}`}>
+                <span className="text-plum">{skill.name}</span>
+                <br />
+                {skill.detail}
+              </p>
+            ))}
+          </div>
         </div>
         {showContinue && (
-          <div className="mt-4 flex justify-end">
+          <div className="vs-ability-footer mt-4 flex justify-end">
             <button type="button" onClick={dismiss} className="pixel-btn px-5 py-3 text-xs">
               继续
             </button>

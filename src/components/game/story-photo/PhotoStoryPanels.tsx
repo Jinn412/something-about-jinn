@@ -1,3 +1,5 @@
+import "./photo-mobile-panels.css";
+
 interface PhotoStoryDialogueProps {
   text: string;
   onAdvance: () => void;
@@ -28,26 +30,26 @@ interface ProfilePanelProps {
 
 export function ProfilePanel({ onDismiss }: ProfilePanelProps) {
   return (
-    <div className="absolute inset-0 z-30 flex items-center justify-center bg-black/40 px-4">
-      <div className="pixel-frame w-full max-w-md p-4">
-        <div className="pixel-panel px-5 py-5 text-sm leading-8">
-          <p className="mb-4 text-plum">人物档案已更新</p>
+    <div className="photo-profile-panel absolute inset-0 z-30 flex items-center justify-center bg-black/40 px-4">
+      <div className="photo-profile-frame pixel-frame w-full max-w-md p-4">
+        <div className="photo-profile-body pixel-panel px-5 py-5 text-sm leading-8">
+          <p className="photo-profile-title mb-4 text-plum">人物档案已更新</p>
           <p>
             出生地
             <br />
             内蒙古
           </p>
-          <p className="mt-4">初始属性</p>
-          <p className="mt-2 text-xs leading-7 md:text-sm">
+          <p className="photo-profile-section mt-4">初始属性</p>
+          <p className="photo-profile-stats mt-2 text-xs leading-7 md:text-sm">
             好奇心 ★★★★★
             <br />
             观察力 ★★★★★
             <br />
             想象力 ★★★★☆
           </p>
-          <p className="mt-4 border-t-4 border-wood pt-4">人格类型：ENTP</p>
+          <p className="photo-profile-type mt-4 border-t-4 border-wood pt-4">人格类型：ENTP</p>
         </div>
-        <div className="mt-4 flex justify-end">
+        <div className="photo-profile-footer mt-4 flex justify-end">
           <button type="button" onClick={onDismiss} className="pixel-btn px-5 py-3 text-xs">
             继续
           </button>

@@ -1,0 +1,71 @@
+/* Vase hub exhibit only. Desktop rules live in ItemZoom markup — do not add any here. */
+@media (orientation: landscape) and (pointer: coarse) and (max-height: 520px) {
+  .vase-exhibit-detail {
+    box-sizing: border-box;
+    top: 0;
+    right: 0;
+    bottom: auto;
+    left: 0;
+    height: 100dvh;
+    max-height: 100dvh;
+    padding-top: max(8px, env(safe-area-inset-top));
+    padding-right: max(12px, env(safe-area-inset-right));
+    padding-bottom: max(8px, env(safe-area-inset-bottom));
+    padding-left: max(12px, env(safe-area-inset-left));
+  }
+
+  .vase-exhibit-detail .vase-exhibit-panel {
+    width: min(74vw, 36rem);
+    max-width: 100%;
+    max-height: calc(100dvh - 20px);
+  }
+
+  .vase-exhibit-detail .vase-exhibit-panel > .pixel-frame {
+    display: flex;
+    max-height: calc(100dvh - 20px);
+    flex-direction: column;
+    box-sizing: border-box;
+    padding: 8px;
+  }
+
+  .vase-exhibit-detail .vase-exhibit-art-wrap {
+    flex: 0 0 auto;
+    padding: 6px 8px;
+  }
+
+  .vase-exhibit-detail .vase-exhibit-art {
+    height: min(50dvh, calc(var(--vase-art-h) * 1px)) !important;
+    width: calc(
+      min(50dvh, calc(var(--vase-art-h) * 1px)) * var(--vase-art-w) / var(--vase-art-h)
+    ) !important;
+    max-width: 100%;
+    background-size:
+      calc(min(50dvh, calc(var(--vase-art-h) * 1px)) * var(--vase-bg-w) / var(--vase-art-h))
+      calc(min(50dvh, calc(var(--vase-art-h) * 1px)) * var(--vase-bg-h) / var(--vase-art-h)) !important;
+    background-position:
+      calc(min(50dvh, calc(var(--vase-art-h) * 1px)) * var(--vase-bg-x) / var(--vase-art-h))
+      calc(min(50dvh, calc(var(--vase-art-h) * 1px)) * var(--vase-bg-y) / var(--vase-art-h)) !important;
+  }
+
+  .vase-exhibit-detail .vase-exhibit-copy {
+    flex-shrink: 0;
+    margin-top: 8px;
+    padding: 10px 20px;
+    font-size: 14px;
+    line-height: 1.7;
+  }
+
+  .vase-exhibit-detail .vase-exhibit-copy .vase-exhibit-title {
+    margin-bottom: 0.25rem;
+    font-size: 12px;
+  }
+
+  .vase-exhibit-detail .vase-exhibit-actions {
+    flex-shrink: 0;
+    margin-top: 8px;
+  }
+
+  .vase-exhibit-detail .vase-exhibit-actions .pixel-btn {
+    padding: 0.5rem 1rem;
+  }
+}

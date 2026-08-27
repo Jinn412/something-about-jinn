@@ -8,7 +8,6 @@ import { HUB_ITEMS } from "@/game/items";
 import { resolveHubItem } from "@/game/photoItems";
 import { isOfficialStoryEntry, withDevStoryEntry } from "@/game/devStories";
 import { merchantIntro, merchantPhotoComplete, merchantVaseComplete, merchantTelescopeComplete } from "@/game/dialogue";
-import { isFinalPreview } from "@/game/finalPreview";
 import { useGame } from "@/game/GameContext";
 import { FinalSequence } from "../FinalSequence";
 import type { FinalSequencePhase, InteractiveItem } from "@/game/types";
@@ -29,13 +28,16 @@ const MERCHANT_SCENE = {
 } as const;
 
 export function HubScene({
+  preview = false,
   onPreviewPhase,
   onExitPreview,
 }: {
+  /** DEV visual-only ending; never from production. */
+  preview?: boolean;
   onPreviewPhase?: (phase: FinalSequencePhase) => void;
   onExitPreview?: () => void;
 }) {
-  const preview = isFinalPreview();
+  const previewOnly = import.meta.env.DEV && preview;
   const {
     playerName,
     giveMagnifier,
@@ -64,7 +66,7 @@ export function HubScene({
     enterDevStory,
     clearDevStoryEntry,
   } = useGame();
-  const [dialogueDone, setDialogueDone] = useState(hasMagnifier || preview);
+  const [dialogueDone, setDialogueDone] = useState(hasMagnifier || previewOnly);
   const [photoDialogueActive, setPhotoDialogueActive] = useState(false);
   const [vaseDialogueActive, setVaseDialogueActive] = useState(false);
   const [telescopeDialogueActive, setTelescopeDialogueActive] = useState(false);
@@ -105,7 +107,7 @@ export function HubScene({
     pendingPhotoMerchantDialogue ||
     pendingVaseMerchantDialogue ||
     pendingTelescopeMerchantDialogue;
-  const balloonPhase = preview ? previewPhase : finalSequencePhase;
+  const balloonPhase = previewOnly ? previewPhase : finalSequencePhase;
   const showCartOcclusion =
     balloonPhase === "celebration" ||
     balloonPhase === "celebration-complete" ||
@@ -114,14 +116,14 @@ export function HubScene({
     balloonPhase === "end-title" ||
     balloonPhase === "complete";
   const endingLocked =
-    preview ||
+    previewOnly ||
     (hearts >= 10 && finalRewardReady) ||
     finalSequenceStarted ||
     finalSequenceComplete;
   const hubIdle = dialogueDone && !merchantBusy && !zoomed && !isFading && !endingLocked;
 
   const openItem = (item: InteractiveItem) => {
-    if (preview || endingLocked) return;
+    if (previewOnly || endingLocked) return;
     markInspected(item.id);
     if (item.kind === "egg") markSideItemViewed(item.id);
     setZoomed(
@@ -132,20 +134,20 @@ export function HubScene({
   };
 
   useEffect(() => {
-    if (preview) return;
+    if (previewOnly) return;
     if (!hubIdle) return;
     tryGrantFinalHeart();
-  }, [preview, hubIdle, tryGrantFinalHeart]);
+  }, [previewOnly, hubIdle, tryGrantFinalHeart]);
 
   useEffect(() => {
-    if (preview) return;
+    if (previewOnly) return;
     if (hearts < 10 || !finalRewardReady) return;
     if (finalSequenceStarted || finalSequenceComplete) return;
     if (!dialogueDone || merchantBusy || zoomed || isFading) return;
     const id = window.setTimeout(() => startFinalSequence(), 420 + 850);
     return () => window.clearTimeout(id);
   }, [
-    preview,
+    previewOnly,
     hearts,
     finalRewardReady,
     finalSequenceStarted,
@@ -158,14 +160,14 @@ export function HubScene({
   ]);
 
   useEffect(() => {
-    if (!preview) return;
+    if (!previewOnly) return;
     const id = window.setTimeout(() => {
       setPreviewSequenceOn(true);
       setPreviewPhase("merchant");
       onPreviewPhase?.("merchant");
     }, 850);
     return () => window.clearTimeout(id);
-  }, [preview, onPreviewPhase]);
+  }, [previewOnly, onPreviewPhase]);
 
   return (
     <div className="relative h-full w-full overflow-hidden bg-[oklch(0.22_0.03_250)]">
@@ -212,7 +214,7 @@ export function HubScene({
             width={MERCHANT_W}
             height={MERCHANT_H}
             loading="lazy"
-            className={`absolute${(preview ? previewPhase : finalSequencePhase) === "celebration" ? " final-merchant-bob" : ""}`}
+            className={`absolute${(previewOnly ? previewPhase : finalSequencePhase) === "celebration" ? " final-merchant-bob" : ""}`}
             style={{
               left: MERCHANT_SCENE.left,
               bottom: MERCHANT_SCENE.bottom,
@@ -354,7 +356,7 @@ export function HubScene({
         />
       )}
 
-      {preview
+      {previewOnly
         ? previewSequenceOn && (
             <FinalSequence
               preview

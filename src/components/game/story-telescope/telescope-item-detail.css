@@ -1,0 +1,107 @@
+/* Hub Telescope ItemZoom only. Desktop rules stay in ItemZoom markup. */
+@media (orientation: landscape) and (pointer: coarse) and (max-height: 520px) {
+  .telescope-item-detail {
+    box-sizing: border-box;
+    top: 0;
+    right: 0;
+    bottom: auto;
+    left: 0;
+    height: 100dvh;
+    max-height: 100dvh;
+    padding-top: max(8px, env(safe-area-inset-top, 0px));
+    padding-right: max(12px, env(safe-area-inset-right, 0px));
+    padding-bottom: max(8px, env(safe-area-inset-bottom, 0px));
+    padding-left: max(12px, env(safe-area-inset-left, 0px));
+  }
+
+  .telescope-item-detail .telescope-detail-panel {
+    width: min(88vw, 56rem);
+    max-width: 100%;
+    max-height: calc(
+      100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - 16px
+    );
+  }
+
+  .telescope-item-detail .telescope-detail-frame {
+    display: flex;
+    max-height: calc(
+      100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - 16px
+    );
+    flex-direction: row;
+    align-items: stretch;
+    box-sizing: border-box;
+    gap: 10px;
+    padding: 10px;
+  }
+
+  .telescope-item-detail .telescope-detail-visual {
+    display: flex;
+    min-width: 0;
+    flex: 0 0 45%;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+    container-type: inline-size;
+  }
+
+  /* Crop is a background-div (not <img>). Scale uniformly like object-fit: contain. */
+  .telescope-item-detail .telescope-detail-art {
+    --tele-draw-h: min(
+      66dvh,
+      calc(var(--tele-art-h) * 1px),
+      calc(100cqw * var(--tele-art-h) / var(--tele-art-w))
+    );
+    --tele-draw-w: calc(var(--tele-draw-h) * var(--tele-art-w) / var(--tele-art-h));
+    width: var(--tele-draw-w) !important;
+    height: var(--tele-draw-h) !important;
+    max-width: 100%;
+    max-height: 66dvh;
+    object-fit: contain;
+    background-size:
+      calc(var(--tele-draw-h) * var(--tele-bg-w) / var(--tele-art-h))
+      calc(var(--tele-draw-h) * var(--tele-bg-h) / var(--tele-art-h)) !important;
+    background-position:
+      calc(var(--tele-draw-h) * var(--tele-bg-x) / var(--tele-art-h))
+      calc(var(--tele-draw-h) * var(--tele-bg-y) / var(--tele-art-h)) !important;
+    background-repeat: no-repeat;
+  }
+
+  .telescope-item-detail .telescope-detail-copy-col {
+    display: flex;
+    min-width: 0;
+    flex: 1 1 55%;
+    flex-direction: column;
+  }
+
+  .telescope-item-detail .telescope-detail-copy {
+    display: flex;
+    min-height: 0;
+    flex: 1 1 auto;
+    flex-direction: column;
+    margin-top: 0;
+    overflow: hidden;
+    padding: 10px 16px;
+    font-size: 14px;
+    line-height: 1.65;
+  }
+
+  .telescope-item-detail .telescope-detail-copy .telescope-detail-title {
+    margin-bottom: 0.35rem;
+    font-size: 12px;
+  }
+
+  .telescope-item-detail .telescope-detail-copy-text {
+    min-height: 0;
+    overflow-y: auto;
+  }
+
+  .telescope-item-detail .telescope-detail-actions {
+    flex-shrink: 0;
+    margin-top: 8px;
+  }
+
+  .telescope-item-detail .telescope-detail-actions .pixel-btn {
+    min-height: 44px;
+    padding: 0.55rem 1rem;
+  }
+}

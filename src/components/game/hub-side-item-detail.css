@@ -1,0 +1,108 @@
+/* Hub side-item ItemZoom only. Photo / Vase / Telescope must not use these classes. */
+@media (orientation: landscape) and (pointer: coarse) and (max-height: 520px) {
+  .hub-side-item-detail {
+    box-sizing: border-box;
+    top: 0;
+    right: 0;
+    bottom: auto;
+    left: 0;
+    height: 100dvh;
+    max-height: 100dvh;
+    padding-top: max(8px, env(safe-area-inset-top, 0px));
+    padding-right: max(12px, env(safe-area-inset-right, 0px));
+    padding-bottom: max(8px, env(safe-area-inset-bottom, 0px));
+    padding-left: max(12px, env(safe-area-inset-left, 0px));
+  }
+
+  .hub-side-item-detail .hub-side-item-panel {
+    width: min(88vw, 56rem);
+    max-width: 100%;
+    max-height: calc(
+      100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - 16px
+    );
+  }
+
+  .hub-side-item-detail .hub-side-item-frame {
+    display: flex;
+    max-height: calc(
+      100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - 16px
+    );
+    flex-direction: row;
+    align-items: stretch;
+    box-sizing: border-box;
+    gap: 10px;
+    padding: 10px;
+  }
+
+  .hub-side-item-detail .hub-side-item-visual {
+    display: flex;
+    min-width: 0;
+    flex: 0 0 45%;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+    container-type: inline-size;
+  }
+
+  /* Hub crop is a background-div. Scale uniformly like object-fit: contain. */
+  .hub-side-item-detail .hub-side-item-art {
+    --side-draw-h: min(
+      62dvh,
+      calc(var(--side-art-h) * 1px),
+      calc(100cqw * var(--side-art-h) / var(--side-art-w))
+    );
+    --side-draw-w: calc(var(--side-draw-h) * var(--side-art-w) / var(--side-art-h));
+    width: var(--side-draw-w) !important;
+    height: var(--side-draw-h) !important;
+    max-width: 100%;
+    max-height: 62dvh;
+    object-fit: contain;
+    background-size:
+      calc(var(--side-draw-h) * var(--side-bg-w) / var(--side-art-h))
+      calc(var(--side-draw-h) * var(--side-bg-h) / var(--side-art-h)) !important;
+    background-position:
+      calc(var(--side-draw-h) * var(--side-bg-x) / var(--side-art-h))
+      calc(var(--side-draw-h) * var(--side-bg-y) / var(--side-art-h)) !important;
+    background-repeat: no-repeat;
+  }
+
+  .hub-side-item-detail .hub-side-item-copy-col {
+    display: flex;
+    min-width: 0;
+    flex: 1 1 55%;
+    flex-direction: column;
+  }
+
+  .hub-side-item-detail .hub-side-item-copy {
+    display: flex;
+    min-height: 0;
+    flex: 1 1 auto;
+    flex-direction: column;
+    margin-top: 0;
+    overflow: hidden;
+    padding: 10px 16px;
+    font-size: 14px;
+    line-height: 1.65;
+  }
+
+  .hub-side-item-detail .hub-side-item-copy .hub-side-item-title {
+    margin-bottom: 0.35rem;
+    font-size: 12px;
+  }
+
+  .hub-side-item-detail .hub-side-item-copy-text {
+    min-height: 0;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .hub-side-item-detail .hub-side-item-actions {
+    flex-shrink: 0;
+    margin-top: 8px;
+  }
+
+  .hub-side-item-detail .hub-side-item-actions .pixel-btn {
+    min-height: 44px;
+    padding: 0.55rem 1rem;
+  }
+}

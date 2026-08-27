@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState } from "react";
+import { useVaseMobileLandscape } from "./useVaseMobileLandscape";
+import "./vase-mobile-landscape.css";
 
 const NOTES = [
   { who: "客户", text: "这里再突出一点。", left: "8%", top: "26%" },
@@ -55,6 +57,7 @@ export function VaseYears({ onCoverDesk, onDeskReady }: VaseYearsProps) {
   const [black, setBlack] = useState(false);
   const coveredRef = useRef(false);
   const timers = useRef<number[]>([]);
+  const mobileLandscape = useVaseMobileLandscape();
 
   useEffect(() => {
     let cancelled = false;
@@ -149,6 +152,9 @@ export function VaseYears({ onCoverDesk, onDeskReady }: VaseYearsProps) {
   const mark = note >= 0 ? MARKS[note] : null;
   const showRev = revPhase === "a" || revPhase === "b" || revPhase === "c";
   const showEdit = revPhase === "b" || revPhase === "c";
+  const clockNode = (
+    <div className={`vs-s3-clock ${clockFocus ? "is-focus" : ""}`}>{clock}</div>
+  );
 
   return (
     <div className="pointer-events-none absolute inset-0 z-[20]">
@@ -170,9 +176,11 @@ export function VaseYears({ onCoverDesk, onDeskReady }: VaseYearsProps) {
             <RevisionBurst phase={revPhase} showEdit={showEdit} />
           )}
 
-          <div className={`vs-s3-clock ${clockFocus ? "is-focus" : ""}`}>{clock}</div>
+          {!mobileLandscape && clockNode}
         </div>
       </div>
+
+      {mobileLandscape && <div className="vs-s3-clock-overlay">{clockNode}</div>}
 
       {black && <div className="vs-s3-black" />}
     </div>
