@@ -11,6 +11,10 @@ node_modules
 dist
 dist-ssr
 .output
+
+# Env (never commit secrets)
+.env
+.env.*
 .vinxi
 .tanstack/**
 .nitro
