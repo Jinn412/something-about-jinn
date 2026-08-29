@@ -14,3 +14,6 @@ Players discover Jinn's education, professional experience, interests, and futur
 - TypeScript
 - Vite
 - Cloudflare Workers
+## Live Demo
+
+[Play Something About Jinn](https://jinn412-something-about-jinn.jinn412.workers.dev)
