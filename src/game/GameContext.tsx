@@ -36,7 +36,10 @@ type WritableCheckpoint =
   | "telescope_perspectives"
   | "telescope_late_night"
   | "telescope_future"
-  | "telescope_ending";
+  | "telescope_ending"
+  | "final_merchant"
+  | "final_starfruit"
+  | "final_celebration";
 
 type PhotoSceneCheckpoint =
   | "photo_scene_2"
@@ -275,6 +278,13 @@ export function GameProvider({ children }: { children: ReactNode }) {
 
   const saveCheckpoint = useCallback((gameState: GameState, checkpoint: WritableCheckpoint) => {
     if (isDevStoryEntryRef.current) return;
+    if (
+      checkpoint === "hub" &&
+      gameState.finalSequenceStarted &&
+      !gameState.finalSequenceComplete
+    ) {
+      return;
+    }
     writeSaveGame(buildSaveGameState(gameState, checkpoint));
   }, []);
 
@@ -349,16 +359,22 @@ export function GameProvider({ children }: { children: ReactNode }) {
         finalSequenceStarted: true,
         finalSequencePhase: "merchant",
       };
-    });
+    }, "final_merchant");
   }, [commitGameState]);
 
   const setFinalSequencePhase = useCallback(
     (phase: FinalSequencePhase) => {
+      const checkpoint =
+        phase === "starfruit"
+          ? "final_starfruit"
+          : phase === "celebration"
+            ? "final_celebration"
+            : undefined;
       commitGameState((s) => {
         if (!s.finalSequenceStarted || s.finalSequenceComplete) return s;
         if (s.finalSequencePhase === phase) return s;
         return { ...s, finalSequencePhase: phase };
-      });
+      }, checkpoint);
     },
     [commitGameState],
   );
@@ -371,7 +387,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
         finalSequenceComplete: true,
         finalSequencePhase: "complete",
       };
-    });
+    }, "final_celebration");
   }, [commitGameState]);
 
   const resetGame = useCallback(() => {
