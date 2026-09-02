@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useGame } from "@/game/GameContext";
+import type { SaveCheckpoint } from "@/game/saveGame";
 import { PhotoStoryBackdrop } from "../story-photo/PhotoStoryBackdrop";
 import {
   MapUnlockPanel,
@@ -14,9 +15,11 @@ import "../story-photo/photo-story.css";
 
 type OverlayKind = "profile" | "map-imu" | "map-ntu" | "complete" | null;
 
+const SCENE2_FIRST_LINE = "于是，她去了第一张更大的地图。";
 const SCENE3_RAW_LINE = "如果故事可以被写出来，为什么不能被走进去？";
 const SCENE3_SHOWROOM_LINE = "于是，她走进了展览展示行业。";
 const SCENE4_SG_LINE = "两年多以后，她又一次不满足于已经熟悉的答案。";
+const SCENE5_FIRST_LINE = "在这里，她开始接触很多从未真正走近的东西。技术、媒介、交互。";
 const SCENE4_NTU_LINE = "所以，她选择重新回到学校。";
 const SCENE4_LEARN_LINE = "如果一个人知道自己不知道什么，她可以去学习。";
 const SCENE4_UNKNOWN_LINE = "可如果一个人连自己不知道什么都不知道呢？";
@@ -34,33 +37,118 @@ const SCENE6_BLACK_OUT_MS = 520;
 const SCENE6_SETTLE_MS = 900;
 const SCENE6_HOLD_MS = 900;
 
+type PhotoResumeStart = {
+  step: number;
+  scene: PhotoSceneId;
+  grasslandReveal: boolean;
+  openingPhoto: boolean;
+  lineText: string | null;
+  scene6Cam: "idle" | "push" | "punch" | "path";
+  scene6Drift: Scene6Drift;
+  scene6LineIn: boolean;
+};
+
+function beatIndexForLine(text: string): number {
+  return PHOTO_STORY_BEATS.findIndex((b) => b.kind === "line" && b.text === text);
+}
+
+/** Stable scene-start locals. Never restores timers, geo, camera, or overlay frames. */
+function photoResumeStart(checkpoint: SaveCheckpoint | null): PhotoResumeStart {
+  const scene1: PhotoResumeStart = {
+    step: -1,
+    scene: 1,
+    grasslandReveal: false,
+    openingPhoto: true,
+    lineText: null,
+    scene6Cam: "idle",
+    scene6Drift: 0,
+    scene6LineIn: false,
+  };
+
+  const lineStart = (
+    scene: PhotoSceneId,
+    text: string,
+    extra?: Partial<PhotoResumeStart>,
+  ): PhotoResumeStart => {
+    const step = beatIndexForLine(text);
+    if (step < 0) return scene1;
+    return {
+      ...scene1,
+      step,
+      scene,
+      grasslandReveal: true,
+      openingPhoto: false,
+      lineText: text,
+      ...extra,
+    };
+  };
+
+  switch (checkpoint) {
+    case "photo_scene_2":
+      return lineStart(2, SCENE2_FIRST_LINE);
+    case "photo_scene_3":
+      return lineStart(3, SCENE3_RAW_LINE);
+    case "photo_scene_4":
+      return lineStart(4, SCENE4_SG_LINE);
+    case "photo_scene_5":
+      return lineStart(5, SCENE5_FIRST_LINE);
+    case "photo_scene_6":
+      return lineStart(6, SCENE6_LINE_1, {
+        scene6Cam: "path",
+        scene6Drift: 1,
+        scene6LineIn: true,
+      });
+    default:
+      return scene1;
+  }
+}
+
 export function StoryPhotoScene() {
-  const { completePhotoStory, goToScene, photoStoryComplete, isDevStoryEntry, clearDevStoryEntry } =
-    useGame();
+  const {
+    completePhotoStory,
+    goToScene,
+    photoStoryComplete,
+    isDevStoryEntry,
+    clearDevStoryEntry,
+    pendingStoryResumeCheckpoint,
+    markPhotoSceneCheckpoint,
+  } = useGame();
   const isReplay = useRef(photoStoryComplete).current;
   const enteredAsDev = useRef(isDevStoryEntry).current;
-  const [step, setStep] = useState(-1);
-  const [scene, setScene] = useState<PhotoSceneId>(1);
-  const [grasslandReveal, setGrasslandReveal] = useState(false);
-  const [openingPhoto, setOpeningPhoto] = useState(true);
+  const resumeAt = useRef(pendingStoryResumeCheckpoint).current;
+  const start = photoResumeStart(resumeAt);
+  const persistPhotoScene = useCallback(
+    (checkpoint: Parameters<typeof markPhotoSceneCheckpoint>[0]) => {
+      if (isReplay || enteredAsDev) return;
+      markPhotoSceneCheckpoint(checkpoint);
+    },
+    [enteredAsDev, isReplay, markPhotoSceneCheckpoint],
+  );
+  const persistPhotoSceneRef = useRef(persistPhotoScene);
+  persistPhotoSceneRef.current = persistPhotoScene;
+
+  const [step, setStep] = useState(start.step);
+  const [scene, setScene] = useState<PhotoSceneId>(start.scene);
+  const [grasslandReveal, setGrasslandReveal] = useState(start.grasslandReveal);
+  const [openingPhoto, setOpeningPhoto] = useState(start.openingPhoto);
   const [galleryStage, setGalleryStage] = useState(0);
   const [digitalLevel, setDigitalLevel] = useState(0);
   const [showPhotoPath, setShowPhotoPath] = useState(false);
   const [outgoingScene, setOutgoingScene] = useState<PhotoSceneId | null>(null);
   const [overlay, setOverlay] = useState<OverlayKind>(null);
-  const [lineText, setLineText] = useState<string | null>(null);
+  const [lineText, setLineText] = useState<string | null>(start.lineText);
   const [geoPhase, setGeoPhase] = useState<"enter" | "hold" | "exit" | null>(null);
   const [scene3Showroom, setScene3Showroom] = useState(false);
   const [scene3Lock, setScene3Lock] = useState(false);
   const [scene3Light, setScene3Light] = useState<0 | 1 | 2>(0);
   const [scene4Phase, setScene4Phase] = useState<Scene4Phase>("sg");
   const [scene4Lock, setScene4Lock] = useState(false);
-  const [scene6Cam, setScene6Cam] = useState<"idle" | "push" | "punch" | "path">("idle");
-  const [scene6Drift, setScene6Drift] = useState<Scene6Drift>(0);
+  const [scene6Cam, setScene6Cam] = useState<"idle" | "push" | "punch" | "path">(start.scene6Cam);
+  const [scene6Drift, setScene6Drift] = useState<Scene6Drift>(start.scene6Drift);
   const [scene6Lock, setScene6Lock] = useState(false);
   const [scene6Through, setScene6Through] = useState(false);
   const [dialogueOut, setDialogueOut] = useState(false);
-  const [scene6LineIn, setScene6LineIn] = useState(false);
+  const [scene6LineIn, setScene6LineIn] = useState(start.scene6LineIn);
   const [scene6Black, setScene6Black] = useState<"in" | "hold" | "out" | null>(null);
   const [scene6PathHold, setScene6PathHold] = useState(false);
 
@@ -144,6 +232,7 @@ export function StoryPhotoScene() {
           setOutgoingScene(null);
           setScene3Showroom(false);
           setScene3Light(0);
+          persistPhotoSceneRef.current("photo_scene_3");
           setStep(
             PHOTO_STORY_BEATS.findIndex(
               (b) => b.kind === "line" && b.text === SCENE3_RAW_LINE,
@@ -164,6 +253,9 @@ export function StoryPhotoScene() {
       const fadeMs = beat.scene === 5 ? 1400 : 800;
       const id = window.setTimeout(() => {
         setOutgoingScene(null);
+        if (beat.scene === 2) persistPhotoSceneRef.current("photo_scene_2");
+        else if (beat.scene === 4) persistPhotoSceneRef.current("photo_scene_4");
+        else if (beat.scene === 5) persistPhotoSceneRef.current("photo_scene_5");
         setStep((s) => s + 1);
       }, fadeMs);
       return () => window.clearTimeout(id);
@@ -227,6 +319,7 @@ export function StoryPhotoScene() {
         setScene6LineIn(true);
         setScene6Lock(false);
         setScene6Through(false);
+        persistPhotoSceneRef.current("photo_scene_6");
         setStep(
           PHOTO_STORY_BEATS.findIndex((b) => b.kind === "line" && b.text === SCENE6_LINE_1),
         );

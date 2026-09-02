@@ -17,8 +17,24 @@ import {
   type SaveGameState,
 } from "./saveGame";
 
-/** Auto-save MVP: only entry checkpoints that remount at Story defaults. */
-type MvpAutoSaveCheckpoint = "hub" | "photo_scene_1" | "vase_scene_1" | "telescope_search";
+/** Checkpoints this round is allowed to write. Photo 2–6 are mid-story scene starts. */
+type WritableCheckpoint =
+  | "hub"
+  | "photo_scene_1"
+  | "photo_scene_2"
+  | "photo_scene_3"
+  | "photo_scene_4"
+  | "photo_scene_5"
+  | "photo_scene_6"
+  | "vase_scene_1"
+  | "telescope_search";
+
+type PhotoSceneCheckpoint =
+  | "photo_scene_2"
+  | "photo_scene_3"
+  | "photo_scene_4"
+  | "photo_scene_5"
+  | "photo_scene_6";
 
 const INITIAL_STATE: GameState = {
   playerName: "",
@@ -75,6 +91,13 @@ interface GameContextValue extends GameState {
   isDevStoryEntry: boolean;
   enterDevStory: (scene: SceneId) => void;
   clearDevStoryEntry: () => void;
+  /**
+   * One-shot Continue instruction. Not part of GameState / localStorage.
+   * Story scenes may read this only to initialize their first mount.
+   */
+  pendingStoryResumeCheckpoint: SaveCheckpoint | null;
+  /** Persist a Photo mid-story scene start. No-op for DEV / replay. */
+  markPhotoSceneCheckpoint: (checkpoint: PhotoSceneCheckpoint) => void;
 }
 
 const GameContext = createContext<GameContextValue | null>(null);
@@ -213,18 +236,33 @@ export function GameProvider({ children }: { children: ReactNode }) {
   const [scene, setScene] = useState<SceneId>("title");
   const [isFading, setIsFading] = useState(false);
   const [isDevStoryEntry, setIsDevStoryEntry] = useState(false);
+  const [pendingStoryResumeCheckpoint, setPendingStoryResumeCheckpoint] =
+    useState<SaveCheckpoint | null>(null);
   const stateRef = useRef(state);
   const isDevStoryEntryRef = useRef(isDevStoryEntry);
   stateRef.current = state;
   isDevStoryEntryRef.current = isDevStoryEntry;
 
-  const saveCheckpoint = useCallback((gameState: GameState, checkpoint: MvpAutoSaveCheckpoint) => {
+  const clearPendingStoryResume = useCallback(() => {
+    setPendingStoryResumeCheckpoint(null);
+  }, []);
+
+  const saveCheckpoint = useCallback((gameState: GameState, checkpoint: WritableCheckpoint) => {
     if (isDevStoryEntryRef.current) return;
     writeSaveGame(buildSaveGameState(gameState, checkpoint));
   }, []);
 
+  const markPhotoSceneCheckpoint = useCallback(
+    (checkpoint: PhotoSceneCheckpoint) => {
+      const current = stateRef.current;
+      if (current.photoStoryComplete) return;
+      saveCheckpoint(current, checkpoint);
+    },
+    [saveCheckpoint],
+  );
+
   const commitGameState = useCallback(
-    (updater: (s: GameState) => GameState, checkpoint?: MvpAutoSaveCheckpoint) => {
+    (updater: (s: GameState) => GameState, checkpoint?: WritableCheckpoint) => {
       const prev = stateRef.current;
       const next = updater(prev);
       stateRef.current = next;
@@ -237,6 +275,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
 
   const goToScene = useCallback(
     (next: SceneId) => {
+      clearPendingStoryResume();
       if (!isDevStoryEntryRef.current) {
         const current = stateRef.current;
         if (next === "hub") saveCheckpoint(current, "hub");
@@ -254,7 +293,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
         window.setTimeout(() => setIsFading(false), 220);
       }, 700);
     },
-    [saveCheckpoint],
+    [saveCheckpoint, clearPendingStoryResume],
   );
 
   const startFinalSequence = useCallback(() => {
@@ -301,6 +340,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
     stateRef.current = initial;
     isDevStoryEntryRef.current = false;
     setState(initial);
+    setPendingStoryResumeCheckpoint(null);
     setScene("title");
     setIsFading(false);
     setIsDevStoryEntry(false);
@@ -312,6 +352,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
     stateRef.current = restored;
     isDevStoryEntryRef.current = false;
     setState(restored);
+    setPendingStoryResumeCheckpoint(save.checkpoint);
     setIsFading(false);
     setIsDevStoryEntry(false);
     setScene(ending.scene);
@@ -327,6 +368,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
     stateRef.current = initial;
     isDevStoryEntryRef.current = false;
     setState(initial);
+    setPendingStoryResumeCheckpoint(null);
     setIsDevStoryEntry(false);
     setIsFading(true);
     window.setTimeout(() => {
@@ -437,6 +479,8 @@ export function GameProvider({ children }: { children: ReactNode }) {
       hydrateSaveGame,
       startNewGame,
       isDevStoryEntry,
+      pendingStoryResumeCheckpoint,
+      markPhotoSceneCheckpoint,
       enterDevStory: (next) => {
         if (!import.meta.env.DEV) return;
         isDevStoryEntryRef.current = true;
@@ -461,6 +505,8 @@ export function GameProvider({ children }: { children: ReactNode }) {
       resetGame,
       hydrateSaveGame,
       startNewGame,
+      pendingStoryResumeCheckpoint,
+      markPhotoSceneCheckpoint,
     ],
   );
 
