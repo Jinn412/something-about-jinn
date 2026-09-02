@@ -82,13 +82,20 @@ interface VaseTheLineProps {
   onZoom: () => void;
   onFloor: () => void;
   onFinish?: () => void;
+  /** Skip intro timers and mount at the floorplan end beat (feedback overlay). */
+  startAtEnd?: boolean;
 }
 
 /** Scene 2: four questions on the desk, into the monitor, then a route on the floorplan. */
-export function VaseTheLine({ onZoom, onFloor, onFinish }: VaseTheLineProps) {
-  const [phase, setPhase] = useState<Phase>("show");
+export function VaseTheLine({
+  onZoom,
+  onFloor,
+  onFinish,
+  startAtEnd = false,
+}: VaseTheLineProps) {
+  const [phase, setPhase] = useState<Phase>(startAtEnd ? "end" : "show");
   const [zoom, setZoom] = useState(false);
-  const [unfolded, setUnfolded] = useState(0);
+  const [unfolded, setUnfolded] = useState(startAtEnd ? 4 : 0);
   const [ping, setPing] = useState<number | null>(null);
   const [askOut, setAskOut] = useState(false);
   const [toldOut, setToldOut] = useState(false);
@@ -101,6 +108,7 @@ export function VaseTheLine({ onZoom, onFloor, onFinish }: VaseTheLineProps) {
   };
 
   useEffect(() => {
+    if (startAtEnd) return;
     const flyAt = CARD_POP_STAGGER_MS * 3 + 140 + CARD_HOLD_MS;
     const zoomAt = flyAt + ZOOM_AFTER_FLY_MS;
     const flashAt = zoomAt + ZOOM_MS;

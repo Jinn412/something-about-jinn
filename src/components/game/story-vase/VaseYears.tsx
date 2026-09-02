@@ -45,13 +45,15 @@ type RevPhase = "a" | "b" | "c" | "hold" | null;
 interface VaseYearsProps {
   onCoverDesk: () => void;
   onDeskReady: () => void;
+  /** Skip the auto feedback/clock/revision sequence; clock already settled. */
+  settled?: boolean;
 }
 
 /** Scene 3: serial beats through desk. Dialogue and second tender are click-driven in the parent. */
-export function VaseYears({ onCoverDesk, onDeskReady }: VaseYearsProps) {
+export function VaseYears({ onCoverDesk, onDeskReady, settled = false }: VaseYearsProps) {
   const [note, setNote] = useState(-1);
   const [noteOut, setNoteOut] = useState(false);
-  const [clock, setClock] = useState("72:00:00");
+  const [clock, setClock] = useState(settled ? "01:16:38" : "72:00:00");
   const [clockFocus, setClockFocus] = useState(false);
   const [revPhase, setRevPhase] = useState<RevPhase>(null);
   const [black, setBlack] = useState(false);
@@ -60,6 +62,7 @@ export function VaseYears({ onCoverDesk, onDeskReady }: VaseYearsProps) {
   const mobileLandscape = useVaseMobileLandscape();
 
   useEffect(() => {
+    if (settled) return;
     let cancelled = false;
 
     const wait = (ms: number) =>

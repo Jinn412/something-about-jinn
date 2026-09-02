@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import vaseDesk from "@/assets/vasedesk.png";
 import tenderArt from "@/assets/tender.png";
 import tenderOpenArt from "@/assets/tenderopen.png";
@@ -10,6 +10,7 @@ import { VaseTheLine } from "../story-vase/VaseTheLine";
 import { VaseYears } from "../story-vase/VaseYears";
 import { VaseAbilityPanel } from "../story-vase/VaseAbilityPanel";
 import { useGame } from "@/game/GameContext";
+import type { SaveCheckpoint } from "@/game/saveGame";
 import "../story-vase/vase-story.css";
 
 const DESK_HOLD_MS = 700;
@@ -101,16 +102,151 @@ const HIGHLIGHTS = [
 
 type HintId = "plan" | "space";
 
+type VaseResumeCheckpoint =
+  | "vase_scene_1"
+  | "vase_scene_2"
+  | "vase_feedback"
+  | "vase_second_tender"
+  | "vase_projects"
+  | "vase_ability";
+
+function isVaseResumeCheckpoint(cp: SaveCheckpoint | null): cp is VaseResumeCheckpoint {
+  return (
+    cp === "vase_scene_1" ||
+    cp === "vase_scene_2" ||
+    cp === "vase_feedback" ||
+    cp === "vase_second_tender" ||
+    cp === "vase_projects" ||
+    cp === "vase_ability"
+  );
+}
+
+type VaseResumeStart = {
+  skipScene1Intro: boolean;
+  scene2: boolean;
+  scene3: boolean;
+  lineAtEnd: boolean;
+  yearsSettled: boolean;
+  showTender: boolean;
+  tenderLanded: boolean;
+  showDeadline: boolean;
+  extraCount: number;
+  showYears: boolean;
+  yearsRest: boolean;
+  showAbility: boolean;
+  floorTaken: boolean;
+  deskZoom: boolean;
+  s3RestDone: boolean;
+  s3PunchDone: boolean;
+  s3YearsDone: boolean;
+};
+
+function vaseResumeStart(checkpoint: SaveCheckpoint | null): VaseResumeStart {
+  const scene1: VaseResumeStart = {
+    skipScene1Intro: false,
+    scene2: false,
+    scene3: false,
+    lineAtEnd: false,
+    yearsSettled: false,
+    showTender: false,
+    tenderLanded: false,
+    showDeadline: false,
+    extraCount: 0,
+    showYears: false,
+    yearsRest: false,
+    showAbility: false,
+    floorTaken: false,
+    deskZoom: false,
+    s3RestDone: false,
+    s3PunchDone: false,
+    s3YearsDone: false,
+  };
+
+  switch (checkpoint) {
+    case "vase_scene_2":
+      return { ...scene1, skipScene1Intro: true, scene2: true, showDeadline: true };
+    case "vase_feedback":
+      return {
+        ...scene1,
+        skipScene1Intro: true,
+        scene2: true,
+        scene3: true,
+        lineAtEnd: true,
+        showDeadline: true,
+        floorTaken: true,
+        deskZoom: true,
+      };
+    case "vase_second_tender":
+      return {
+        ...scene1,
+        skipScene1Intro: true,
+        scene3: true,
+        yearsSettled: true,
+        s3RestDone: true,
+      };
+    case "vase_projects":
+      return {
+        ...scene1,
+        skipScene1Intro: true,
+        scene3: true,
+        yearsSettled: true,
+        showTender: true,
+        tenderLanded: true,
+        s3RestDone: true,
+        s3PunchDone: true,
+      };
+    case "vase_ability":
+      return {
+        ...scene1,
+        skipScene1Intro: true,
+        scene3: true,
+        yearsSettled: true,
+        showTender: true,
+        tenderLanded: true,
+        extraCount: 3,
+        showYears: true,
+        yearsRest: true,
+        showAbility: true,
+        s3RestDone: true,
+        s3PunchDone: true,
+        s3YearsDone: true,
+      };
+    default:
+      return scene1;
+  }
+}
+
 /** Vase Story Scene 1: desk drop → open tender → three choices. Stops before Scene 2. */
 export function StoryVaseScene() {
-  const { completeVaseStory, goToScene, vaseStoryComplete, isDevStoryEntry, clearDevStoryEntry } =
-    useGame();
+  const {
+    completeVaseStory,
+    goToScene,
+    vaseStoryComplete,
+    isDevStoryEntry,
+    clearDevStoryEntry,
+    pendingStoryResumeCheckpoint,
+    markVaseSceneCheckpoint,
+  } = useGame();
   const isReplay = useRef(vaseStoryComplete).current;
   const enteredAsDev = useRef(isDevStoryEntry).current;
-  const [showTender, setShowTender] = useState(false);
-  const [tenderLanded, setTenderLanded] = useState(false);
+  const resumeAt = useRef(
+    isVaseResumeCheckpoint(pendingStoryResumeCheckpoint) ? pendingStoryResumeCheckpoint : null,
+  ).current;
+  const start = vaseResumeStart(resumeAt);
+  const persistVaseScene = useCallback(
+    (checkpoint: Parameters<typeof markVaseSceneCheckpoint>[0]) => {
+      if (isReplay || enteredAsDev) return;
+      markVaseSceneCheckpoint(checkpoint);
+    },
+    [enteredAsDev, isReplay, markVaseSceneCheckpoint],
+  );
+  const persistVaseSceneRef = useRef(persistVaseScene);
+  persistVaseSceneRef.current = persistVaseScene;
+
+  const [showTender, setShowTender] = useState(start.showTender);
+  const [tenderLanded, setTenderLanded] = useState(start.tenderLanded);
   const [impact, setImpact] = useState(false);
-  const [showDeadline, setShowDeadline] = useState(false);
+  const [showDeadline, setShowDeadline] = useState(start.showDeadline);
   const [showLine, setShowLine] = useState(false);
   const [lineFading, setLineFading] = useState(false);
   const [lifting, setLifting] = useState(false);
@@ -123,31 +259,33 @@ export function StoryVaseScene() {
   const [showResolve, setShowResolve] = useState(false);
   const [resolveFading, setResolveFading] = useState(false);
   const [receding, setReceding] = useState(false);
-  const [scene2, setScene2] = useState(false);
-  const [scene3, setScene3] = useState(false);
+  const [scene2, setScene2] = useState(start.scene2);
+  const [scene3, setScene3] = useState(start.scene3);
   const [scene3Line, setScene3Line] = useState<
     "desk" | "punch" | "years" | "close1" | "close2" | null
   >(null);
   const [scene3LineOut, setScene3LineOut] = useState(false);
   const [s3Drop, setS3Drop] = useState(false);
   const [punchOut, setPunchOut] = useState(false);
-  const [extraCount, setExtraCount] = useState(0);
+  const [extraCount, setExtraCount] = useState(start.extraCount);
   const [showCut, setShowCut] = useState(false);
   const [cutOut, setCutOut] = useState(false);
-  const [showYears, setShowYears] = useState(false);
-  const [yearsRest, setYearsRest] = useState(false);
-  const [showAbility, setShowAbility] = useState(false);
+  const [showYears, setShowYears] = useState(start.showYears);
+  const [yearsRest, setYearsRest] = useState(start.yearsRest);
+  const [showAbility, setShowAbility] = useState(start.showAbility);
   const [endBlack, setEndBlack] = useState(false);
-  const [deskZoom, setDeskZoom] = useState(false);
-  const [floorTaken, setFloorTaken] = useState(false);
+  const [deskZoom, setDeskZoom] = useState(start.deskZoom);
+  const [floorTaken, setFloorTaken] = useState(start.floorTaken);
   const pickedRef = useRef(false);
-  const s3RestDone = useRef(false);
-  const s3PunchDone = useRef(false);
-  const s3YearsDone = useRef(false);
+  const s3RestDone = useRef(start.s3RestDone);
+  const s3PunchDone = useRef(start.s3PunchDone);
+  const s3YearsDone = useRef(start.s3YearsDone);
   const closeStarted = useRef(false);
   const close1Done = useRef(false);
   const close2Done = useRef(false);
   const timersRef = useRef<number[]>([]);
+  const lineAtEnd = start.lineAtEnd;
+  const yearsSettled = start.yearsSettled;
 
   const queue = (fn: () => void, ms: number) => {
     const id = window.setTimeout(fn, ms);
@@ -155,7 +293,65 @@ export function StoryVaseScene() {
     return id;
   };
 
+  const startSecondTender = () => {
+    persistVaseSceneRef.current("vase_second_tender");
+    setReceding(false);
+    setOpened(false);
+    setLifting(false);
+    setCrossfade(false);
+    setTenderLanded(false);
+    setS3Drop(true);
+    setShowTender(true);
+    queue(() => setImpact(true), S3_IMPACT_AT_MS);
+    queue(() => setImpact(false), S3_IMPACT_AT_MS + IMPACT_MS);
+    queue(() => setTenderLanded(true), S3_DROP_MS);
+    queue(() => setScene3Line("punch"), S3_DROP_MS + S3_PUNCH_PAUSE_MS);
+  };
+
+  const startProjects = () => {
+    persistVaseSceneRef.current("vase_projects");
+    queue(() => setExtraCount(1), DIALOGUE_FADE_MS + S3_AFTER_PUNCH_MS);
+    queue(() => setExtraCount(2), DIALOGUE_FADE_MS + S3_AFTER_PUNCH_MS + S3_EXTRA_GAP_MS);
+    queue(
+      () => setExtraCount(3),
+      DIALOGUE_FADE_MS + S3_AFTER_PUNCH_MS + S3_EXTRA_GAP_MS * 2,
+    );
+    const filesSettled =
+      DIALOGUE_FADE_MS + S3_AFTER_PUNCH_MS + S3_EXTRA_GAP_MS * 2 + S3_EXTRA_IN_MS;
+    const blackAt = filesSettled + S3_AFTER_FILES_MS;
+    queue(() => setShowCut(true), blackAt);
+    queue(() => setShowYears(true), blackAt + S3_BLACK_IN_MS + S3_BLACK_HOLD_MS);
+    queue(() => {
+      setYearsRest(true);
+      setCutOut(true);
+    }, blackAt + S3_BLACK_IN_MS + S3_BLACK_HOLD_MS + S3_YEARS_IN_MS + S3_YEARS_HOLD_MS);
+    queue(
+      () => setShowCut(false),
+      blackAt +
+        S3_BLACK_IN_MS +
+        S3_BLACK_HOLD_MS +
+        S3_YEARS_IN_MS +
+        S3_YEARS_HOLD_MS +
+        S3_BLACK_OUT_MS,
+    );
+    queue(
+      () => setScene3Line("years"),
+      blackAt +
+        S3_BLACK_IN_MS +
+        S3_BLACK_HOLD_MS +
+        S3_YEARS_IN_MS +
+        S3_YEARS_HOLD_MS +
+        S3_BLACK_OUT_MS +
+        S3_AFTER_DESK_MS,
+    );
+  };
+
   useEffect(() => {
+    if (start.skipScene1Intro) {
+      return () => {
+        timersRef.current.forEach((id) => window.clearTimeout(id));
+      };
+    }
     const dropAt = DESK_HOLD_MS;
     const settledAt = dropAt + DROP_MS;
     const deadlineAt = settledAt + DEADLINE_AFTER_SETTLE_MS;
@@ -171,6 +367,22 @@ export function StoryVaseScene() {
       ids.forEach((id) => window.clearTimeout(id));
       timersRef.current.forEach((id) => window.clearTimeout(id));
     };
+    // Scene 1 intro plays once; resume skips it.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (resumeAt !== "vase_second_tender") return;
+    startSecondTender();
+    // resume once
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (resumeAt !== "vase_projects") return;
+    startProjects();
+    // resume once
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const startOpen = () => {
@@ -214,6 +426,7 @@ export function StoryVaseScene() {
     queue(() => setShowResolve(false), DIALOGUE_FADE_MS);
     queue(() => {
       setShowTender(false);
+      persistVaseSceneRef.current("vase_scene_2");
       setScene2(true);
     }, 420);
   };
@@ -226,22 +439,7 @@ export function StoryVaseScene() {
       setScene3Line(null);
       setScene3LineOut(false);
     }, DIALOGUE_FADE_MS);
-    queue(() => {
-      setReceding(false);
-      setOpened(false);
-      setLifting(false);
-      setCrossfade(false);
-      setTenderLanded(false);
-      setS3Drop(true);
-      setShowTender(true);
-      queue(() => setImpact(true), S3_IMPACT_AT_MS);
-      queue(() => setImpact(false), S3_IMPACT_AT_MS + IMPACT_MS);
-      queue(() => setTenderLanded(true), S3_DROP_MS);
-    }, DIALOGUE_FADE_MS + S3_QUIET_MS);
-    queue(
-      () => setScene3Line("punch"),
-      DIALOGUE_FADE_MS + S3_QUIET_MS + S3_DROP_MS + S3_PUNCH_PAUSE_MS,
-    );
+    queue(startSecondTender, DIALOGUE_FADE_MS + S3_QUIET_MS);
   };
 
   const afterPunchClick = () => {
@@ -252,40 +450,7 @@ export function StoryVaseScene() {
       setScene3Line(null);
       setPunchOut(false);
     }, DIALOGUE_FADE_MS);
-    queue(() => setExtraCount(1), DIALOGUE_FADE_MS + S3_AFTER_PUNCH_MS);
-    queue(() => setExtraCount(2), DIALOGUE_FADE_MS + S3_AFTER_PUNCH_MS + S3_EXTRA_GAP_MS);
-    queue(
-      () => setExtraCount(3),
-      DIALOGUE_FADE_MS + S3_AFTER_PUNCH_MS + S3_EXTRA_GAP_MS * 2,
-    );
-    const filesSettled =
-      DIALOGUE_FADE_MS + S3_AFTER_PUNCH_MS + S3_EXTRA_GAP_MS * 2 + S3_EXTRA_IN_MS;
-    const blackAt = filesSettled + S3_AFTER_FILES_MS;
-    queue(() => setShowCut(true), blackAt);
-    queue(() => setShowYears(true), blackAt + S3_BLACK_IN_MS + S3_BLACK_HOLD_MS);
-    queue(() => {
-      setYearsRest(true);
-      setCutOut(true);
-    }, blackAt + S3_BLACK_IN_MS + S3_BLACK_HOLD_MS + S3_YEARS_IN_MS + S3_YEARS_HOLD_MS);
-    queue(
-      () => setShowCut(false),
-      blackAt +
-        S3_BLACK_IN_MS +
-        S3_BLACK_HOLD_MS +
-        S3_YEARS_IN_MS +
-        S3_YEARS_HOLD_MS +
-        S3_BLACK_OUT_MS,
-    );
-    queue(
-      () => setScene3Line("years"),
-      blackAt +
-        S3_BLACK_IN_MS +
-        S3_BLACK_HOLD_MS +
-        S3_YEARS_IN_MS +
-        S3_YEARS_HOLD_MS +
-        S3_BLACK_OUT_MS +
-        S3_AFTER_DESK_MS,
-    );
+    startProjects();
   };
 
   const afterYearsClick = () => {
@@ -296,7 +461,10 @@ export function StoryVaseScene() {
       setScene3Line(null);
       setScene3LineOut(false);
     }, DIALOGUE_FADE_MS);
-    queue(() => setShowAbility(true), DIALOGUE_FADE_MS + 300);
+    queue(() => {
+      persistVaseSceneRef.current("vase_ability");
+      setShowAbility(true);
+    }, DIALOGUE_FADE_MS + 300);
   };
 
   const afterAbilityDismiss = () => {
@@ -475,14 +643,19 @@ export function StoryVaseScene() {
 
       {scene2 && (
         <VaseTheLine
+          startAtEnd={lineAtEnd}
           onZoom={() => setDeskZoom(true)}
           onFloor={() => setFloorTaken(true)}
-          onFinish={() => setScene3(true)}
+          onFinish={() => {
+            persistVaseSceneRef.current("vase_feedback");
+            setScene3(true);
+          }}
         />
       )}
 
       {scene3 && (
         <VaseYears
+          settled={yearsSettled}
           onCoverDesk={() => {
             setScene2(false);
             setFloorTaken(false);

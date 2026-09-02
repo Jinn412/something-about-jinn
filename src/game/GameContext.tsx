@@ -27,6 +27,11 @@ type WritableCheckpoint =
   | "photo_scene_5"
   | "photo_scene_6"
   | "vase_scene_1"
+  | "vase_scene_2"
+  | "vase_feedback"
+  | "vase_second_tender"
+  | "vase_projects"
+  | "vase_ability"
   | "telescope_search";
 
 type PhotoSceneCheckpoint =
@@ -35,6 +40,13 @@ type PhotoSceneCheckpoint =
   | "photo_scene_4"
   | "photo_scene_5"
   | "photo_scene_6";
+
+type VaseSceneCheckpoint =
+  | "vase_scene_2"
+  | "vase_feedback"
+  | "vase_second_tender"
+  | "vase_projects"
+  | "vase_ability";
 
 const INITIAL_STATE: GameState = {
   playerName: "",
@@ -98,6 +110,8 @@ interface GameContextValue extends GameState {
   pendingStoryResumeCheckpoint: SaveCheckpoint | null;
   /** Persist a Photo mid-story scene start. No-op for DEV / replay. */
   markPhotoSceneCheckpoint: (checkpoint: PhotoSceneCheckpoint) => void;
+  /** Persist a Vase mid-story scene start. No-op for DEV / replay. */
+  markVaseSceneCheckpoint: (checkpoint: VaseSceneCheckpoint) => void;
 }
 
 const GameContext = createContext<GameContextValue | null>(null);
@@ -256,6 +270,15 @@ export function GameProvider({ children }: { children: ReactNode }) {
     (checkpoint: PhotoSceneCheckpoint) => {
       const current = stateRef.current;
       if (current.photoStoryComplete) return;
+      saveCheckpoint(current, checkpoint);
+    },
+    [saveCheckpoint],
+  );
+
+  const markVaseSceneCheckpoint = useCallback(
+    (checkpoint: VaseSceneCheckpoint) => {
+      const current = stateRef.current;
+      if (current.vaseStoryComplete) return;
       saveCheckpoint(current, checkpoint);
     },
     [saveCheckpoint],
@@ -481,6 +504,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
       isDevStoryEntry,
       pendingStoryResumeCheckpoint,
       markPhotoSceneCheckpoint,
+      markVaseSceneCheckpoint,
       enterDevStory: (next) => {
         if (!import.meta.env.DEV) return;
         isDevStoryEntryRef.current = true;
@@ -507,6 +531,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
       startNewGame,
       pendingStoryResumeCheckpoint,
       markPhotoSceneCheckpoint,
+      markVaseSceneCheckpoint,
     ],
   );
 
