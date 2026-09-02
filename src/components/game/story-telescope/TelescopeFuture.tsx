@@ -69,15 +69,22 @@ type Step =
   | "starfield";
 
 /** Telescope Story Future / Direction. Stops at starfield + TRACKING ACTIVE. */
-export function TelescopeFuture({ onStarfieldReady }: { onStarfieldReady?: () => void } = {}) {
+export function TelescopeFuture({
+  onStarfieldReady,
+  settled = false,
+}: {
+  onStarfieldReady?: () => void;
+  /** Skip the auto sequence; already at starfield (ending resume background). */
+  settled?: boolean;
+} = {}) {
   const onStarfieldReadyRef = useRef(onStarfieldReady);
   onStarfieldReadyRef.current = onStarfieldReady;
-  const [step, setStep] = useState<Step>("enter");
+  const [step, setStep] = useState<Step>(settled ? "starfield" : "enter");
   const [qCount, setQCount] = useState(0);
   const [coordCount, setCoordCount] = useState(0);
   const [trackCount, setTrackCount] = useState(0);
   const [clearing, setClearing] = useState(false);
-  const [starfield, setStarfield] = useState(false);
+  const [starfield, setStarfield] = useState(settled);
   const timers = useRef<number[]>([]);
 
   useEffect(() => {
@@ -93,11 +100,12 @@ export function TelescopeFuture({ onStarfieldReady }: { onStarfieldReady?: () =>
   }, []);
 
   useEffect(() => {
+    if (settled) return;
     later(INTRO_MS, () => {
       setStep("questions");
       setQCount(1);
     });
-  }, [later]);
+  }, [later, settled]);
 
   useEffect(() => {
     if (step !== "questions") return;

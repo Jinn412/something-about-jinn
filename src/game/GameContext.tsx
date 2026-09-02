@@ -32,7 +32,11 @@ type WritableCheckpoint =
   | "vase_second_tender"
   | "vase_projects"
   | "vase_ability"
-  | "telescope_search";
+  | "telescope_search"
+  | "telescope_perspectives"
+  | "telescope_late_night"
+  | "telescope_future"
+  | "telescope_ending";
 
 type PhotoSceneCheckpoint =
   | "photo_scene_2"
@@ -47,6 +51,12 @@ type VaseSceneCheckpoint =
   | "vase_second_tender"
   | "vase_projects"
   | "vase_ability";
+
+type TelescopeSceneCheckpoint =
+  | "telescope_perspectives"
+  | "telescope_late_night"
+  | "telescope_future"
+  | "telescope_ending";
 
 const INITIAL_STATE: GameState = {
   playerName: "",
@@ -112,6 +122,8 @@ interface GameContextValue extends GameState {
   markPhotoSceneCheckpoint: (checkpoint: PhotoSceneCheckpoint) => void;
   /** Persist a Vase mid-story scene start. No-op for DEV / replay. */
   markVaseSceneCheckpoint: (checkpoint: VaseSceneCheckpoint) => void;
+  /** Persist a Telescope mid-story phase start. No-op for DEV / replay. */
+  markTelescopeSceneCheckpoint: (checkpoint: TelescopeSceneCheckpoint) => void;
 }
 
 const GameContext = createContext<GameContextValue | null>(null);
@@ -279,6 +291,15 @@ export function GameProvider({ children }: { children: ReactNode }) {
     (checkpoint: VaseSceneCheckpoint) => {
       const current = stateRef.current;
       if (current.vaseStoryComplete) return;
+      saveCheckpoint(current, checkpoint);
+    },
+    [saveCheckpoint],
+  );
+
+  const markTelescopeSceneCheckpoint = useCallback(
+    (checkpoint: TelescopeSceneCheckpoint) => {
+      const current = stateRef.current;
+      if (current.telescopeStoryComplete) return;
       saveCheckpoint(current, checkpoint);
     },
     [saveCheckpoint],
@@ -505,6 +526,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
       pendingStoryResumeCheckpoint,
       markPhotoSceneCheckpoint,
       markVaseSceneCheckpoint,
+      markTelescopeSceneCheckpoint,
       enterDevStory: (next) => {
         if (!import.meta.env.DEV) return;
         isDevStoryEntryRef.current = true;
@@ -532,6 +554,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
       pendingStoryResumeCheckpoint,
       markPhotoSceneCheckpoint,
       markVaseSceneCheckpoint,
+      markTelescopeSceneCheckpoint,
     ],
   );
 
