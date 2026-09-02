@@ -1,9 +1,34 @@
+import { useEffect, useState } from "react";
 import titleSky from "@/assets/title-sky.png";
 import { RainOverlay } from "../RainOverlay";
 import { useGame } from "@/game/GameContext";
+import { clearSaveGame, loadSaveGame, type SaveGameState } from "@/game/saveGame";
+
+const TITLE_BTN = "pixel-btn font-pixel px-6 py-4 text-xs md:text-sm";
 
 export function TitleScene() {
-  const { goToScene } = useGame();
+  const { goToScene, hydrateSaveGame, startNewGame } = useGame();
+  const [save, setSave] = useState<SaveGameState | null>(null);
+  const [confirmingNew, setConfirmingNew] = useState(false);
+
+  useEffect(() => {
+    setSave(loadSaveGame());
+  }, []);
+
+  const showContinue = save != null && !save.progression.finalSequenceComplete;
+
+  const onNewGame = () => {
+    if (save) {
+      setConfirmingNew(true);
+      return;
+    }
+    goToScene("setup");
+  };
+
+  const onConfirmNewGame = () => {
+    clearSaveGame();
+    startNewGame();
+  };
 
   return (
     <div
@@ -31,13 +56,34 @@ export function TitleScene() {
           </h1>
         </div>
 
-        <button
-          type="button"
-          onClick={() => goToScene("setup")}
-          className="pixel-btn font-pixel px-6 py-4 text-xs md:text-sm"
-        >
-          ▶ NEW GAME
-        </button>
+        {confirmingNew ? (
+          <div className="flex flex-col items-center gap-4">
+            <p className="font-pixel text-center text-xs leading-relaxed text-parchment md:text-sm">
+              Start a new game?
+              <br />
+              Your current progress will be lost.
+            </p>
+            <button type="button" onClick={onConfirmNewGame} className={TITLE_BTN}>
+              START NEW GAME
+            </button>
+            <button type="button" onClick={() => setConfirmingNew(false)} className={TITLE_BTN}>
+              BACK
+            </button>
+          </div>
+        ) : showContinue ? (
+          <div className="flex flex-col items-center gap-4">
+            <button type="button" onClick={() => hydrateSaveGame(save)} className={TITLE_BTN}>
+              ▶ CONTINUE
+            </button>
+            <button type="button" onClick={onNewGame} className={TITLE_BTN}>
+              ▶ NEW GAME
+            </button>
+          </div>
+        ) : (
+          <button type="button" onClick={onNewGame} className={TITLE_BTN}>
+            ▶ NEW GAME
+          </button>
+        )}
       </div>
     </div>
   );
